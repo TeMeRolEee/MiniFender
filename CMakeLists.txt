@@ -9,7 +9,7 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5Core HINTS ~/Qt/5.11.1/gcc_64/)
 find_package(Qt5Sql HINTS ~/Qt/5.11.1/gcc_64)
 
-add_executable(MiniFender main.cpp core.cpp core.h enginehandler.cpp enginehandler.h)
+add_executable(MiniFender main.cpp core.cpp enginehandler.cpp)
 
 # linking
 target_link_libraries(MiniFender Qt5::Core Qt5::Sql)
