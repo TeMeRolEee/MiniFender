@@ -11,15 +11,15 @@ public:
 
 	~EngineHandler() override;
 
-	const QString &getResult() const;
+	const QJsonObject &getResult() const;
 
 private:
 	QString programPath;
 	QStringList arguments;
 	QProcess *engineProcess;
-	QString result;
+	QJsonObject *result;
 
-public slots:
+private slots:
 
 	void settingResult_slot();
 

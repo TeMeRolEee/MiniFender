@@ -7,7 +7,7 @@
 class Core : public QObject {
 Q_OBJECT
 public:
-	bool addNewEngine(const QString &enginePath);
+	bool addNewEngine(const QString &enginePath, const QStringList &parameterList);
 
 private:
 	int engineIdIncrementer = 0;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCommandLineParser>
@@ -17,7 +18,11 @@ int main(int argc, char *argv[]) {
 
 	auto core = std::make_unique<Core>();
 
-	core->addNewEngine();
+	QStringList params;
+
+	params  << "-s" << "/home/temerole/Downloads/Custom_Engines_v4_wrapper_Sellable_Symantec_Custom_Engine_27487_artifacts.zip";
+
+	core->addNewEngine("/home/temerole/Academy/BlackListEngine/cmake-build-debug/BlackListEngine", params);
 
 	return QCoreApplication::exec();
 }
