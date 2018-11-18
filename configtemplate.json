@@ -1,0 +1,12 @@
+{
+  "engines" : [
+    {
+      "engineName" : "EngineName1",
+      "enginePath" : "/path/to/the/engine/1"
+    },
+    {
+      "engineName" : "EngineName2",
+      "enginePath" : "/path/to/the/engine/2"
+    }
+  ]
+}
