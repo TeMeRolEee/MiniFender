@@ -3,21 +3,24 @@
 #include <QtCore/QObject>
 #include <QtCore/QProcess>
 
+#include "engine.h"
+
 class EngineHandler : public QObject {
 	Q_OBJECT
 
 public:
 	EngineHandler(const QString &programPath, const QStringList &arguments);
 
-	~EngineHandler() override;
+    bool addNewEngine(const QString &enginePath, const QStringList &parameterList);
 
-	const QJsonObject &getResult() const;
+	~EngineHandler() override;
 
 private:
 	QString programPath;
 	QStringList arguments;
-	QProcess *engineProcess;
+	QVector<Engine*> *engineList;
 	QJsonObject *result;
+	int engineCount = 0;
 
 private slots:
 
