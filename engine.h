@@ -23,6 +23,8 @@ private:
     QStringList engineParams;
     QJsonObject tempResult;
 
+    QMap<int, QProcess*> engineProcesses;
+
 public slots:
     void handleProcessDone_slot();
 

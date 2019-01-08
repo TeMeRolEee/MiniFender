@@ -5,7 +5,6 @@
 
 Engine::Engine(QObject *parent, int id, const QString &enginePath)
         : QThread(parent), id(id), enginePath(enginePath) {
-    process = new QProcess(parent);
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
             &Engine::handleProcessDone_slot);
 }
