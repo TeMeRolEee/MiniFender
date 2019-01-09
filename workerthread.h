@@ -4,8 +4,9 @@
 #include <QtCore/QThread>
 
 class WorkerThread : public QThread {
+Q_OBJECT
 public:
-    WorkerThread();
+    WorkerThread(const QString &enginePath, const QStringList &paramList);
 
     ~WorkerThread();
 
@@ -14,6 +15,15 @@ protected:
 
 private:
     QProcess *process;
+    QString enginePath;
+    QStringList paramList;
+
+public slots:
+    void processDone_slot();
+
+signals:
+    void processDone_signal(QJsonObject resultArray);
+
 };
 
 

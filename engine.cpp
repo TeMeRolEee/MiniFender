@@ -25,18 +25,8 @@ void Engine::startEngine_slot() {
     process->start(enginePath, engineParams);
 }
 
-void Engine::shutDownEngine_slot() {
-    process->close();
-}
-
 void Engine::handleProcessDone_slot() {
-    QString tempString = process->readAllStandardOutput();
 
-    tempResult = QJsonDocument::fromJson(tempString.toUtf8()).object();
-
-    QJsonDocument qJsonDocument(tempResult);
-
-    qDebug() << qJsonDocument.toJson();
 }
 
 
