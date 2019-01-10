@@ -6,32 +6,20 @@
 
 #include "enginehandler.h"
 
-EngineHandler::EngineHandler(const QString &programPath, const QStringList &arguments) :
-	programPath(programPath),
-	arguments(arguments) {
+EngineHandler::EngineHandler() {
 
-    engineList = new QVector<Engine*>();
+    //engineList = new QVector<Engine*>();
 
-	result = new QJsonObject();
+	//result = new QJsonObject();
 }
 
 EngineHandler::~EngineHandler() {
 	delete engineList;
-	delete result;
-}
-
-void EngineHandler::settingResult_slot() {
-	/*QString tempString = engineList->readAllStandardOutput();
-
-	*result = QJsonDocument::fromJson(tempString.toUtf8()).object();
-
-	QJsonDocument qJsonDocument(*result);
-
-	qDebug() << qJsonDocument.toJson();*/
+	//delete result;
 }
 
 bool EngineHandler::addNewEngine(const QString &enginePath, const QStringList &parameterList) {
-	auto *newEngine = new Engine(this, engineCount, enginePath);
+	/*auto *newEngine = new Engine(this, engineCount, enginePath);
 
 	newEngine->setNewConfig(parameterList);
 
@@ -39,6 +27,6 @@ bool EngineHandler::addNewEngine(const QString &enginePath, const QStringList &p
 
 	//connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &EngineHandler::settingResult_slot);
 
-	//engineList->start(programPath, arguments);
+	//engineList->start(programPath, arguments);*/
 	return false;
 }

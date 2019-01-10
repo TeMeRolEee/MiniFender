@@ -3,11 +3,12 @@
 #include <QtCore/QThread>
 #include <QtCore/QProcess>
 #include <QtCore/QJsonObject>
+#include "workerthread.h"
 
 class Engine : public QThread {
 Q_OBJECT
 public:
-    Engine(QObject *parent, int id, const QString &enginePath);
+    Engine(int id, const QString &enginePath);
 
     ~Engine() override;
 
@@ -17,18 +18,18 @@ protected:
     void run() override;
 
 private:
-    QProcess *process = nullptr;
-    int id;
+    int id = 0;
     const QString enginePath;
-    QStringList engineParams;
-    QJsonObject tempResult;
 
-    QMap<int, QProcess*> *engineProcesses;
+    QMap<int, WorkerThread*> *engineProcesses;
 
 public slots:
-    void handleProcessDone_slot();
+    void handleProcessDone_slot(QJsonObject resultArray);
 
-    void startEngine_slot();
+    void startEngine_slot(int id);
+
+    void addNewEngine_slot(QStringList &params);
+
 
 signals:
     void processDone_signal();

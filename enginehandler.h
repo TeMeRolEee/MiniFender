@@ -9,22 +9,17 @@ class EngineHandler : public QObject {
 	Q_OBJECT
 
 public:
-	EngineHandler(const QString &programPath, const QStringList &arguments);
+	EngineHandler();
 
     bool addNewEngine(const QString &enginePath, const QStringList &parameterList);
 
 	~EngineHandler() override;
 
 private:
-	QString programPath;
-	QStringList arguments;
-	QVector<Engine*> *engineList;
-	QJsonObject *result;
+	QMap<int, Engine*> *engineList;
 	int engineCount = 0;
 
 private slots:
-
-	void settingResult_slot();
 
 signals:
 

@@ -20,15 +20,21 @@ int main(int argc, char *argv[]) {
 
     QStringList params;
 
-    QString enginePath = "/home/temerole/Academy/TestEngines/cmake-build-debug/TestEngines";
+    QString enginePath = "/home/temerole/Academy/TestEngines/build/TestEngines";
 
-    params  << "-s" << "/home/temerole/Academy/TestEngines/cmake-build-debug/TestEngines";
+    params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
 
     //auto workerThread = std::make_unique<WorkerThread>(enginePath, params);
 
-    auto workerThread = new WorkerThread(enginePath, params);
+    auto engine = new Engine(1, enginePath);
 
-	workerThread->start();
+    engine->addNewEngine_slot(params);
+
+	engine->startEngine_slot(0);
+
+    //auto workerThread = new WorkerThread(enginePath, params);
+
+	//workerThread->start();
 
 	//core->addNewEngine("/home/temerole/Academy/TestEngines/cmake-build-debug/TestEngines", params);
 
