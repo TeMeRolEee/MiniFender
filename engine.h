@@ -3,6 +3,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QProcess>
 #include <QtCore/QJsonObject>
+#include <QtCore/QMap>
 #include "workerthread.h"
 
 class Engine : public QThread {
@@ -12,14 +13,12 @@ public:
 
     ~Engine() override;
 
-    void setNewConfig(const QStringList &engineParams);
-
 protected:
     void run() override;
 
 private:
     int id = 0;
-    const QString enginePath;
+    QString enginePath;
 
     QMap<int, WorkerThread*> *engineProcesses;
 
@@ -34,5 +33,6 @@ public slots:
 signals:
     void processDone_signal();
 
+    void startEngine_signal();
 };
 

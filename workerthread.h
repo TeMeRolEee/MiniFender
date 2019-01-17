@@ -21,6 +21,8 @@ private:
 public slots:
     void processDone_slot();
 
+    void startWorker_slot();
+
 signals:
     void processDone_signal(QJsonObject resultArray);
 

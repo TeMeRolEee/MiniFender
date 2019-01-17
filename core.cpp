@@ -3,7 +3,7 @@
 #include <iostream>
 
 bool Core::addNewEngine(const QString &enginePath, const QStringList &parameterList) {
-	auto *newEngine = new EngineHandler();
+	//auto *newEngine = new EngineHandler();
 
 	return false;
 }

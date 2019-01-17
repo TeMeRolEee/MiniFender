@@ -21,8 +21,6 @@ EngineHandler::~EngineHandler() {
 bool EngineHandler::addNewEngine(const QString &enginePath, const QStringList &parameterList) {
 	/*auto *newEngine = new Engine(this, engineCount, enginePath);
 
-	newEngine->setNewConfig(parameterList);
-
 	engineList->insert(engineCount++, newEngine);
 
 	//connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &EngineHandler::settingResult_slot);

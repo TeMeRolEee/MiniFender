@@ -20,17 +20,43 @@ int main(int argc, char *argv[]) {
 
     QStringList params;
 
-    QString enginePath = "/home/temerole/Academy/TestEngines/build/TestEngines";
-
     params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
+
+    QString enginePath("/home/temerole/Academy/TestEngines/build/TestEngines");
 
     //auto workerThread = std::make_unique<WorkerThread>(enginePath, params);
 
     auto engine = new Engine(1, enginePath);
 
+    engine->start();
+
     engine->addNewEngine_slot(params);
 
 	engine->startEngine_slot(0);
+
+	// getting a little crazy
+
+	engine->addNewEngine_slot(params);
+
+	engine->startEngine_slot(1);
+
+	engine->addNewEngine_slot(params);
+
+	engine->startEngine_slot(2);
+
+	engine->addNewEngine_slot(params);
+
+	engine->startEngine_slot(3);
+
+	engine->addNewEngine_slot(params);
+
+	engine->startEngine_slot(4);
+
+	engine->addNewEngine_slot(params);
+
+	engine->startEngine_slot(5);
+
+	engine->startEngine_signal();
 
     //auto workerThread = new WorkerThread(enginePath, params);
 
