@@ -27,7 +27,7 @@ public slots:
 
     void startEngine_slot(int id);
 
-    void addNewEngine_slot(QStringList &params);
+    void addNewWorker_slot(QStringList &params);
 
 
 signals:

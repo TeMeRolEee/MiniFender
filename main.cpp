@@ -30,40 +30,33 @@ int main(int argc, char *argv[]) {
 
     engine->start();
 
-    engine->addNewEngine_slot(params);
+    engine->addNewWorker_slot(params);
 
 	engine->startEngine_slot(0);
 
 	// getting a little crazy
 
-	engine->addNewEngine_slot(params);
+    engine->addNewWorker_slot(params);
 
 	engine->startEngine_slot(1);
 
-	engine->addNewEngine_slot(params);
+    engine->addNewWorker_slot(params);
 
 	engine->startEngine_slot(2);
 
-	engine->addNewEngine_slot(params);
+    engine->addNewWorker_slot(params);
 
 	engine->startEngine_slot(3);
 
-	engine->addNewEngine_slot(params);
+    engine->addNewWorker_slot(params);
 
 	engine->startEngine_slot(4);
 
-	engine->addNewEngine_slot(params);
+    engine->addNewWorker_slot(params);
 
 	engine->startEngine_slot(5);
 
 	engine->startEngine_signal();
-
-    //auto workerThread = new WorkerThread(enginePath, params);
-
-	//workerThread->start();
-
-	//core->addNewEngine("/home/temerole/Academy/TestEngines/cmake-build-debug/TestEngines", params);
-
 
 
 	return QCoreApplication::exec();

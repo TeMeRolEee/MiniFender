@@ -7,7 +7,7 @@
 WorkerThread::WorkerThread(const QString &enginePath, const QStringList &paramList) :
         paramList(paramList),
         enginePath(enginePath) {
-    qDebug() << "WorkerThread constructor";
+    qDebug() << "[WORKER]\t" << "WorkerThread constructor";
 
     process = new QProcess();
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
@@ -15,19 +15,20 @@ WorkerThread::WorkerThread(const QString &enginePath, const QStringList &paramLi
 }
 
 WorkerThread::~WorkerThread() {
-    qDebug() << "Deleting worker thread";
+    qDebug() << "[WORKER]\t" << "Deleting worker thread";
 
     process->close();
     delete process;
 }
 
 void WorkerThread::run() {
-    qDebug() << QThread::currentThreadId();
+    qDebug() << "[WORKER]\t" << QThread::currentThreadId();
+
     QThread::run();
 }
 
 void WorkerThread::processDone_slot() {
-    qDebug() << "Starting the engine";
+    qDebug() << "[WORKER]\t" << "Starting the engine";
 
     QString tempString = process->readAllStandardOutput();
 
@@ -35,12 +36,12 @@ void WorkerThread::processDone_slot() {
 
     QJsonDocument qJsonDocument(object);
 
-    qDebug() << qJsonDocument.toJson(QJsonDocument::JsonFormat::Indented);
+    //qDebug() << qJsonDocument.toJson(QJsonDocument::JsonFormat::Indented);
 
     emit processDone_signal(object);
 }
 
 void WorkerThread::startWorker_slot() {
-    qDebug() << "Starting the engine";
+    qDebug() << "[WORKER]\t" << "Starting the engine";
     process->start(enginePath, paramList);
 }
