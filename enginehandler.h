@@ -11,19 +11,19 @@ class EngineHandler : public QObject {
 public:
 	EngineHandler();
 
-    bool addNewEngine(const QString &enginePath, const QStringList &parameterList);
-
 	~EngineHandler() override;
 
 private:
+	void addNewEngine(const QString &enginePath);
+
 	QMap<int, Engine*> *engineList;
 	int engineCount = 0;
 
 private slots:
+	void handleEngineResult_slot(QJsonObject result);
 
 signals:
-
-	void reportSuccesssResult_signal();
+	void reportSuccesssResult_signal(QJsonArray results);
 
 	void reportFailureResult_signal();
 };

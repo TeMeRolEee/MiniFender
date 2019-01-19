@@ -18,7 +18,12 @@ EngineHandler::~EngineHandler() {
 	//delete result;
 }
 
-bool EngineHandler::addNewEngine(const QString &enginePath, const QStringList &parameterList) {
+void EngineHandler::addNewEngine(const QString &enginePath) {
+
+	auto engine = new Engine(engineCount++, enginePath);
+
+	engine->start();
+
 	/*auto *newEngine = new Engine(this, engineCount, enginePath);
 
 	engineList->insert(engineCount++, newEngine);
@@ -26,5 +31,8 @@ bool EngineHandler::addNewEngine(const QString &enginePath, const QStringList &p
 	//connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &EngineHandler::settingResult_slot);
 
 	//engineList->start(programPath, arguments);*/
-	return false;
+}
+
+void EngineHandler::handleEngineResult_slot(QJsonObject result) {
+
 }

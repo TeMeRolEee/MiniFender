@@ -18,11 +18,13 @@ protected:
 
 private:
     int id = 0;
-    QString enginePath;
+    int workerCount = 0;
 
-    QMap<int, WorkerThread*> *engineProcesses;
+    QString enginePath;
+    QMap<int, WorkerThread *> *engineProcesses;
 
 public slots:
+
     void handleProcessDone_slot(QJsonObject resultArray);
 
     void startEngine_slot(int id);
@@ -31,6 +33,7 @@ public slots:
 
 
 signals:
+
     void processDone_signal();
 
     void startEngine_signal();
