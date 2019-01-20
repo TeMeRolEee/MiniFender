@@ -31,11 +31,14 @@ public slots:
 
     void addNewWorker_slot(QStringList &params);
 
+    void deleteEngine_slot();
 
 signals:
 
     void processDone_signal();
 
     void startEngine_signal();
+
+    void deleteEngine_signal();
 };
 

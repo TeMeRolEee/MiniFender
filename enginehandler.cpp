@@ -7,15 +7,11 @@
 #include "enginehandler.h"
 
 EngineHandler::EngineHandler() {
-
-    //engineList = new QVector<Engine*>();
-
-	//result = new QJsonObject();
+    engineList = new QMap<int, Engine*>();
 }
 
 EngineHandler::~EngineHandler() {
 	delete engineList;
-	//delete result;
 }
 
 void EngineHandler::addNewEngine(const QString &enginePath) {
@@ -35,4 +31,12 @@ void EngineHandler::addNewEngine(const QString &enginePath) {
 
 void EngineHandler::handleEngineResult_slot(QJsonObject result) {
 
+}
+
+void EngineHandler::removeEngine(int id) {
+	emit engineList->value(id)->deleteEngine_signal();
+	engineList->value(id)->quit();
+	engineList->value(id)->wait();
+
+	delete engineList->take(id);
 }

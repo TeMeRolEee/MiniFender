@@ -16,6 +16,8 @@ public:
 private:
 	void addNewEngine(const QString &enginePath);
 
+	void removeEngine(int id);
+
 	QMap<int, Engine*> *engineList;
 	int engineCount = 0;
 
@@ -23,9 +25,8 @@ private slots:
 	void handleEngineResult_slot(QJsonObject result);
 
 signals:
-	void reportSuccesssResult_signal(QJsonArray results);
+	//void reportResult_signal(QJsonArray results);
 
-	void reportFailureResult_signal();
 };
 
 

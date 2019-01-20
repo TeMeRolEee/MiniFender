@@ -8,6 +8,7 @@ Engine::Engine(int id, const QString &enginePath)
     qDebug() << "[ENGINE]\t" << enginePath << id;
 
     engineProcesses = new QMap<int, WorkerThread*>();
+    connect(this, &Engine::deleteEngine_signal, this, &Engine::deleteEngine_slot);
 }
 
 Engine::~Engine() {
@@ -19,7 +20,8 @@ void Engine::run() {
 }
 
 void Engine::startEngine_slot(int id) {
-    engineProcesses->value(id)->start();
+    qDebug() << "[ENGINE]\t" << "Engine id:\t" << id << "\tstarting...";
+             engineProcesses->value(id)->start();
 }
 
 void Engine::handleProcessDone_slot(QJsonObject resultArray) {
@@ -37,6 +39,14 @@ void Engine::addNewWorker_slot(QStringList &params) {
 
     connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot);
     connect(this, &Engine::startEngine_signal, workerThread,&WorkerThread::startWorker_slot);
+}
+
+void Engine::deleteEngine_slot() {
+    for (auto worker : engineProcesses->keys()) {
+        engineProcesses->value(worker)->quit();
+        engineProcesses->value(worker)->wait();
+        delete engineProcesses->take(worker);
+    }
 }
 
 

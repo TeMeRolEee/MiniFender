@@ -11,6 +11,6 @@ public:
 
 private:
 	int engineIdIncrementer = 0;
-	QMap<int, EngineHandler *> *engineHandler;
+	EngineHandler *engineHandler;
 };
 
