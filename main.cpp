@@ -26,6 +26,10 @@ int main(int argc, char *argv[]) {
 
     //auto workerThread = std::make_unique<WorkerThread>(enginePath, params);
 
+    auto core = std::make_unique<Core>();
+
+    core->init();
+
     auto engine = new Engine(1, enginePath);
 
     engine->start();

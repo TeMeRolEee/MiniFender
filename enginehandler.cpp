@@ -14,19 +14,18 @@ EngineHandler::~EngineHandler() {
 	delete engineList;
 }
 
+void EngineHandler::run() {
+	qDebug() << "[ENGINE_HANDLER]\t" << "Running";
+	QThread::run();
+}
+
 void EngineHandler::addNewEngine(const QString &enginePath) {
 
-	auto engine = new Engine(engineCount++, enginePath);
-
-	engine->start();
-
-	/*auto *newEngine = new Engine(this, engineCount, enginePath);
-
-	engineList->insert(engineCount++, newEngine);
-
-	//connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &EngineHandler::settingResult_slot);
-
-	//engineList->start(programPath, arguments);*/
+	if (!enginePath.isEmpty()) {
+		auto engine = new Engine(engineCount++, enginePath);
+		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot);
+		engine->start();
+	}
 }
 
 void EngineHandler::handleEngineResult_slot(QJsonObject result) {
@@ -39,4 +38,10 @@ void EngineHandler::removeEngine(int id) {
 	engineList->value(id)->wait();
 
 	delete engineList->take(id);
+}
+
+void EngineHandler::deleteEngineHandler_slot() {
+	for (auto engineID : engineList->keys()) {
+		removeEngine(engineID);
+	}
 }

@@ -21,24 +21,28 @@ void Engine::run() {
 
 void Engine::startEngine_slot(int id) {
     qDebug() << "[ENGINE]\t" << "Engine id:\t" << id << "\tstarting...";
-             engineProcesses->value(id)->start();
+     engineProcesses->value(id)->start();
 }
 
-void Engine::handleProcessDone_slot(QJsonObject resultArray) {
-    qDebug() << "[ENGINE]\t" << QJsonDocument(resultArray).toJson(QJsonDocument::JsonFormat::Compact);
+void Engine::handleProcessDone_slot(QJsonObject result) {
+    qDebug() << "[ENGINE]\t" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
+    emit processDone_signal(result);
 }
 
 void Engine::addNewWorker_slot(QStringList &params) {
-    auto *workerThread = new WorkerThread(enginePath, params);
+    if (!params.isEmpty()) {
+        auto *workerThread = new WorkerThread(enginePath, params);
 
-    qDebug() << "[ENGINE]\t" << "WorkerThread created.";
-    engineProcesses->insert(engineProcesses->count(), workerThread);
+        qDebug() << "[ENGINE]\t" << "WorkerThread created.";
+        engineProcesses->insert(engineProcesses->count(), workerThread);
 
-    workerThread->start();
-    qDebug() << "[ENGINE]\t" << "WorkerThread inserted into map.";
+        workerThread->start();
+        qDebug() << "[ENGINE]\t" << "WorkerThread inserted into map.";
 
-    connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot);
-    connect(this, &Engine::startEngine_signal, workerThread,&WorkerThread::startWorker_slot);
+        connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot);
+        connect(this, &Engine::startEngine_signal, workerThread,&WorkerThread::startWorker_slot);
+    }
+
 }
 
 void Engine::deleteEngine_slot() {

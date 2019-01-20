@@ -25,7 +25,7 @@ private:
 
 public slots:
 
-    void handleProcessDone_slot(QJsonObject resultArray);
+    void handleProcessDone_slot(QJsonObject result);
 
     void startEngine_slot(int id);
 
@@ -35,7 +35,7 @@ public slots:
 
 signals:
 
-    void processDone_signal();
+    void processDone_signal(QJsonObject result);
 
     void startEngine_signal();
 

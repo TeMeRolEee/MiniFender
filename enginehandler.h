@@ -5,13 +5,18 @@
 
 #include "engine.h"
 
-class EngineHandler : public QObject {
+class EngineHandler : public QThread {
 	Q_OBJECT
 
 public:
 	EngineHandler();
 
-	~EngineHandler() override;
+protected:
+    void run() override;
+
+public:
+
+    ~EngineHandler() override;
 
 private:
 	void addNewEngine(const QString &enginePath);
@@ -23,6 +28,8 @@ private:
 
 private slots:
 	void handleEngineResult_slot(QJsonObject result);
+
+    void deleteEngineHandler_slot();
 
 signals:
 	//void reportResult_signal(QJsonArray results);
