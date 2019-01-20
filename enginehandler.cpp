@@ -19,15 +19,6 @@ void EngineHandler::run() {
 	QThread::run();
 }
 
-void EngineHandler::addNewEngine(const QString &enginePath) {
-
-	if (!enginePath.isEmpty()) {
-		auto engine = new Engine(engineCount++, enginePath);
-		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot);
-		engine->start();
-	}
-}
-
 void EngineHandler::handleEngineResult_slot(QJsonObject result) {
 
 }
@@ -43,5 +34,13 @@ void EngineHandler::removeEngine(int id) {
 void EngineHandler::deleteEngineHandler_slot() {
 	for (auto engineID : engineList->keys()) {
 		removeEngine(engineID);
+	}
+}
+
+void EngineHandler::addNewEngine_slot(const QString &enginePath) {
+	if (!enginePath.isEmpty()) {
+		auto engine = new Engine(engineCount++, enginePath);
+		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot);
+		engine->start();
 	}
 }

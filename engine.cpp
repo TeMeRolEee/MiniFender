@@ -42,7 +42,6 @@ void Engine::addNewWorker_slot(QStringList &params) {
         connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot);
         connect(this, &Engine::startEngine_signal, workerThread,&WorkerThread::startWorker_slot);
     }
-
 }
 
 void Engine::deleteEngine_slot() {

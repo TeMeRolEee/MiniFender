@@ -4,20 +4,25 @@
 
 #include "enginehandler.h"
 
-class Core : public QObject {
+class Core : public QThread {
 Q_OBJECT
 public:
     void init();
 
-	bool addNewEngine(const QString &enginePath, const QStringList &parameterList);
+protected:
+	void run() override;
 
 private:
+	void addNewEngine(const QString &enginePath);
+
 	EngineHandler *engineHandler;
 
 private slots:
     void handleEngineHandler_slot(QJsonObject result);
 
 signals:
+	void addNewEngine_signal();
+
     //void reportResult_signal(QJsonArray results);
 
 };

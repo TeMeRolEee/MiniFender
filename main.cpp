@@ -30,7 +30,8 @@ int main(int argc, char *argv[]) {
 
     core->init();
 
-    auto engine = new Engine(1, enginePath);
+
+    /*auto engine = new Engine(1, enginePath);
 
     engine->start();
 
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
 
 	engine->startEngine_slot(5);
 
-	engine->startEngine_signal();
+	engine->startEngine_signal();*/
 
 
 	return QCoreApplication::exec();

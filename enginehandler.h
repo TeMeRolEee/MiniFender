@@ -15,12 +15,9 @@ protected:
     void run() override;
 
 public:
-
     ~EngineHandler() override;
 
 private:
-	void addNewEngine(const QString &enginePath);
-
 	void removeEngine(int id);
 
 	QMap<int, Engine*> *engineList;
@@ -30,6 +27,8 @@ private slots:
 	void handleEngineResult_slot(QJsonObject result);
 
     void deleteEngineHandler_slot();
+
+    void addNewEngine_slot(const QString &enginePath);
 
 signals:
 	//void reportResult_signal(QJsonArray results);
