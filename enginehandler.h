@@ -21,6 +21,7 @@ private:
 	void removeEngine(int id);
 
 	QMap<int, Engine*> *engineList;
+	QMap<int, QString> enginePathList;
 	int engineCount = 0;
 
 private slots:
@@ -30,7 +31,11 @@ private slots:
 
     void addNewEngine_slot(const QString &enginePath);
 
+    void handleNewTask_slot(QMap<int, QStringList> taskList);
+
 signals:
+
+
 	//void reportResult_signal(QJsonArray results);
 
 };

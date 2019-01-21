@@ -9,6 +9,7 @@ Engine::Engine(int id, const QString &enginePath)
 
     engineProcesses = new QMap<int, WorkerThread*>();
     connect(this, &Engine::deleteEngine_signal, this, &Engine::deleteEngine_slot);
+    connect(this, &Engine::addNewWorker_signal, this, &Engine::addNewWorker_slot);
 }
 
 Engine::~Engine() {
@@ -50,6 +51,10 @@ void Engine::deleteEngine_slot() {
         engineProcesses->value(worker)->wait();
         delete engineProcesses->take(worker);
     }
+}
+
+const QString &Engine::getEnginePath() const {
+    return enginePath;
 }
 
 

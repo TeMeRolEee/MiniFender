@@ -39,8 +39,19 @@ void EngineHandler::deleteEngineHandler_slot() {
 
 void EngineHandler::addNewEngine_slot(const QString &enginePath) {
 	if (!enginePath.isEmpty()) {
-		auto engine = new Engine(engineCount++, enginePath);
+		auto engine = new Engine(engineCount, enginePath);
 		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot);
 		engine->start();
+
+        enginePathList.insert(engineCount++, enginePath);
+	}
+}
+
+void EngineHandler::handleNewTask_slot(QMap<int, QStringList> taskList) {
+	if (!taskList.isEmpty()) {
+		for (auto parameter : taskList.keys()) {
+			taskList.value(parameter).first();
+		}
+
 	}
 }

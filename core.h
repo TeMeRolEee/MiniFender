@@ -23,6 +23,8 @@ private slots:
 signals:
 	void addNewEngine_signal();
 
+    void startNewTask_signal(QMap<int, QStringList> taskList);
+
     //void reportResult_signal(QJsonArray results);
 
 };
