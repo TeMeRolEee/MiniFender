@@ -20,24 +20,23 @@ public:
 private:
 	void removeEngine(int id);
 
+	bool findExistingEngine(const QString &enginePath);
+
 	QMap<int, Engine*> *engineList;
-	QMap<int, QString> enginePathList;
+	QMap<QString, int> enginePathList;
 	int engineCount = 0;
 
-private slots:
+public slots:
 	void handleEngineResult_slot(QJsonObject result);
 
     void deleteEngineHandler_slot();
 
     void addNewEngine_slot(const QString &enginePath);
 
-    void handleNewTask_slot(QMap<int, QStringList> taskList);
+    void handleNewTask_slot(QMap<QString, QStringList> taskList);
 
 signals:
-
-
-	//void reportResult_signal(QJsonArray results);
-
+    void
 };
 
 

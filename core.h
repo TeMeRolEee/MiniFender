@@ -9,21 +9,24 @@ Q_OBJECT
 public:
     void init();
 
-protected:
-	void run() override;
-
-private:
 	void addNewEngine(const QString &enginePath);
+
+	void startNewScanTask(const QString filePath);
+
+protected:
+
+	void run() override;
+private:
 
 	EngineHandler *engineHandler;
 
 private slots:
-    void handleEngineHandler_slot(QJsonObject result);
+    void handleResult_slot(QJsonObject result);
 
 signals:
-	void addNewEngine_signal();
+	void addNewEngine_signal(const QString &enginePath);
 
-    void startNewTask_signal(QMap<int, QStringList> taskList);
+    void startNewScanTask_signal(QMap<QString, QStringList> taskList);
 
     //void reportResult_signal(QJsonArray results);
 

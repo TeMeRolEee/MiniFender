@@ -30,6 +30,9 @@ int main(int argc, char *argv[]) {
 
     core->init();
 
+    core->addNewEngine(enginePath);
+
+    core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
     /*auto engine = new Engine(1, enginePath);
 
