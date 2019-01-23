@@ -26,6 +26,8 @@ public slots:
 signals:
     void processDone_signal(QJsonObject resultArray);
 
+    void startWorker_signal();
+
 };
 
 

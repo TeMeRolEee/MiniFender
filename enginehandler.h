@@ -36,7 +36,7 @@ public slots:
     void handleNewTask_slot(QMap<QString, QStringList> taskList);
 
 signals:
-    void
+    //void addNewTask_signal(QStringList &params);
 };
 
 

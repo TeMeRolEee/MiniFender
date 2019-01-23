@@ -20,7 +20,7 @@ void EngineHandler::run() {
 }
 
 void EngineHandler::handleEngineResult_slot(QJsonObject result) {
-	qDebug() << "[ENGINE_HANDLER]\t" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Indented);
+	qDebug() << "[ENGINE_HANDLER]\t" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
 }
 
 void EngineHandler::removeEngine(int id) {
@@ -40,9 +40,11 @@ void EngineHandler::deleteEngineHandler_slot() {
 void EngineHandler::addNewEngine_slot(const QString &enginePath) {
 	if (!enginePath.isEmpty() && !findExistingEngine(enginePath)) {
 		auto engine = new Engine(engineCount, enginePath);
+		qDebug() << "[ENGINE_HANDLER]\t" << "ADDING ENGINE:\t" << engineCount;
 		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot);
+		engineList->insert(engineCount, engine);
+		enginePathList.insert(enginePath, engineCount++);
 		engine->start();
-        enginePathList.insert(enginePath, engineCount++);
 	}
 	for (const auto &engine : enginePathList.keys()) {
 		qDebug() << "[ENGINE_HANDLER]\t" << "ENGINE:\t" << engine;
@@ -50,6 +52,10 @@ void EngineHandler::addNewEngine_slot(const QString &enginePath) {
 }
 
 void EngineHandler::handleNewTask_slot(QMap<QString, QStringList> taskList) {
+	qDebug() << "[ENGINE_HANDLER]\t" << "ENGINE_COUNT:\t" << engineList->count();
+	for (const auto &engine : engineList->keys()) {
+		qDebug() << "[ENGINE_HANDLER]\t" << "ENGINE:\t" << engine;
+	}
 	if (!taskList.isEmpty()) {
 		for (const auto &path : taskList.keys()) {
 			qDebug() << "[ENGINE_HANDLER]\t" << "PATH:\t" << path;

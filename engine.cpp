@@ -30,18 +30,19 @@ void Engine::handleProcessDone_slot(QJsonObject result) {
     emit processDone_signal(result);
 }
 
-void Engine::addNewWorker_slot(QStringList &params) {
+void Engine::addNewWorker_slot(QStringList params) {
     if (!params.isEmpty()) {
         auto *workerThread = new WorkerThread(enginePath, params);
 
         qDebug() << "[ENGINE]\t" << "WorkerThread created.";
-        engineProcesses->insert(engineProcesses->count(), workerThread);
+        engineProcesses->insert(workerCount++, workerThread);
 
         workerThread->start();
         qDebug() << "[ENGINE]\t" << "WorkerThread inserted into map.";
 
         connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot);
         connect(this, &Engine::startEngine_signal, workerThread,&WorkerThread::startWorker_slot);
+        emit workerThread->startWorker_signal();
     }
 }
 

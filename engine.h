@@ -33,12 +33,12 @@ public slots:
 
     void startEngine_slot(int id);
 
-    void addNewWorker_slot(QStringList &params);
+    void addNewWorker_slot(QStringList params);
 
     void deleteEngine_slot();
 
 signals:
-    void addNewWorker_signal(QStringList &params);
+    void addNewWorker_signal(QStringList params);
 
     void processDone_signal(QJsonObject result);
 
