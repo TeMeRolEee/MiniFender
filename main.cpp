@@ -26,7 +26,15 @@ int main(int argc, char *argv[]) {
 
     //auto workerThread = std::make_unique<WorkerThread>(enginePath, params);
 
-    auto engine = new Engine(1, enginePath);
+    auto core = std::make_unique<Core>();
+
+    core->init();
+
+    core->addNewEngine(enginePath);
+
+    core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
+
+    /*auto engine = new Engine(1, enginePath);
 
     engine->start();
 
@@ -56,7 +64,7 @@ int main(int argc, char *argv[]) {
 
 	engine->startEngine_slot(5);
 
-	engine->startEngine_signal();
+	engine->startEngine_signal();*/
 
 
 	return QCoreApplication::exec();

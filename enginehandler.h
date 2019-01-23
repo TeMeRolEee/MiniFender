@@ -5,27 +5,38 @@
 
 #include "engine.h"
 
-class EngineHandler : public QObject {
+class EngineHandler : public QThread {
 	Q_OBJECT
 
 public:
 	EngineHandler();
 
-    bool addNewEngine(const QString &enginePath, const QStringList &parameterList);
+protected:
+    void run() override;
 
-	~EngineHandler() override;
+public:
+    ~EngineHandler() override;
 
 private:
+	void removeEngine(int id);
+
+	bool findExistingEngine(const QString &enginePath);
+
 	QMap<int, Engine*> *engineList;
+	QMap<QString, int> enginePathList;
 	int engineCount = 0;
 
-private slots:
+public slots:
+	void handleEngineResult_slot(QJsonObject result);
+
+    void deleteEngineHandler_slot();
+
+    void addNewEngine_slot(const QString &enginePath);
+
+    void handleNewTask_slot(QMap<QString, QStringList> taskList);
 
 signals:
-
-	void reportSuccesssResult_signal();
-
-	void reportFailureResult_signal();
+    //void addNewTask_signal(QStringList &params);
 };
 
 

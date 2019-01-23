@@ -12,6 +12,7 @@ WorkerThread::WorkerThread(const QString &enginePath, const QStringList &paramLi
     process = new QProcess();
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
             &WorkerThread::processDone_slot);
+    connect(this, &WorkerThread::startWorker_signal, this, &WorkerThread::startWorker_slot);
 }
 
 WorkerThread::~WorkerThread() {
@@ -36,7 +37,7 @@ void WorkerThread::processDone_slot() {
 
     QJsonDocument qJsonDocument(object);
 
-    //qDebug() << qJsonDocument.toJson(QJsonDocument::JsonFormat::Indented);
+    qDebug() << "[WORKER]\t" << qJsonDocument.toJson(QJsonDocument::JsonFormat::Compact);
 
     emit processDone_signal(object);
 }

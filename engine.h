@@ -13,26 +13,37 @@ public:
 
     ~Engine() override;
 
+    const QString &getEnginePath() const;
+
 protected:
     void run() override;
 
 private:
     int id = 0;
+    int workerCount = 0;
+
     QString enginePath;
 
-    QMap<int, WorkerThread*> *engineProcesses;
+private:
+    QMap<int, WorkerThread *> *engineProcesses;
 
 public slots:
-    void handleProcessDone_slot(QJsonObject resultArray);
+
+    void handleProcessDone_slot(QJsonObject result);
 
     void startEngine_slot(int id);
 
-    void addNewWorker_slot(QStringList &params);
+    void addNewWorker_slot(QStringList params);
 
+    void deleteEngine_slot();
 
 signals:
-    void processDone_signal();
+    void addNewWorker_signal(QStringList params);
+
+    void processDone_signal(QJsonObject result);
 
     void startEngine_signal();
+
+    void deleteEngine_signal();
 };
 
