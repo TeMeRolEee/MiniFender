@@ -21,6 +21,7 @@ void EngineHandler::run() {
 
 void EngineHandler::handleEngineResult_slot(QJsonObject result) {
 	qDebug() << "[ENGINE_HANDLER]\t" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
+	emit scanComplete_signal(result);
 }
 
 void EngineHandler::removeEngine(int id) {
