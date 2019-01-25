@@ -8,10 +8,12 @@
 
 EngineHandler::EngineHandler() {
     engineList = new QMap<int, Engine*>();
+    resultArray = new QMap<QString, QJsonArray*>();
 }
 
 EngineHandler::~EngineHandler() {
 	delete engineList;
+	delete resultArray;
 }
 
 void EngineHandler::run() {
