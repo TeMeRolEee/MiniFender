@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QSettings>
 
 void Core::addNewEngine(const QString &enginePath) {
     emit addNewEngine_signal(enginePath);
@@ -16,6 +17,8 @@ void Core::init(const QString &settingsFilePath) {
 
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
     settingsFile = settingsFilePath;
+
+    readSettings();
     qDebug() << "[CORE]\t" << "Settings loaded";
 
     engineHandler = new EngineHandler();
@@ -45,5 +48,10 @@ void Core::startNewScanTask(const QString filePath) {
 }
 
 void Core::readSettings() {
-
+    QSettings settings(settingsFile, QSettings::IniFormat);
+    QStringList keys = settings.childGroups();
+    qDebug() << "[CORE]\t" << keys.count();
+    for (const auto &key : keys) {
+        qDebug() << "[CORE]\t" << "SETTING KEY IS:\t" << key;
+    }
 }

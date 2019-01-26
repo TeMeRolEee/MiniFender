@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
 
     core->init(QCoreApplication::applicationDirPath() + "/settings/settings.ini");
 
-    core->addNewEngine(enginePath);
+    //core->addNewEngine(enginePath);
 
-    core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
+    //core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
 	return QCoreApplication::exec();
 }
