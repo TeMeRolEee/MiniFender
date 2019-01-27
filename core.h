@@ -7,6 +7,8 @@
 class Core : public QThread {
 Q_OBJECT
 public:
+	~Core();
+
     void init(const QString &settingsFilePath);
 
 	void addNewEngine(const QString &enginePath, const QString &scanParameter);
@@ -33,7 +35,8 @@ signals:
 
     void startNewScanTask_signal(QString task);
 
-    //void reportResult_signal(QJsonArray results);
+    void removeEngines_signal();
+
 
 };
 

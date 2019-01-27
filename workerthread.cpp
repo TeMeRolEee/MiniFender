@@ -4,7 +4,8 @@
 
 #include "workerthread.h"
 
-WorkerThread::WorkerThread(const QString &enginePath, const QStringList &paramList) :
+WorkerThread::WorkerThread(int id, const QString &enginePath, const QStringList &paramList) :
+        id(id),
         paramList(paramList),
         enginePath(enginePath) {
     qDebug() << "[WORKER]\t" << "WorkerThread constructor";
@@ -39,7 +40,7 @@ void WorkerThread::processDone_slot() {
 
     qDebug() << "[WORKER]\t" << qJsonDocument.toJson(QJsonDocument::JsonFormat::Compact);
 
-    emit processDone_signal(object);
+    emit processDone_signal(id, object);
 }
 
 void WorkerThread::startWorker_slot() {

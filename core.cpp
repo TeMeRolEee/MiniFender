@@ -6,6 +6,14 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QSettings>
 
+Core::~Core() {
+    emit removeEngines_signal();
+    engineHandler->quit();
+    engineHandler->wait();
+
+    delete engineHandler;
+}
+
 void Core::addNewEngine(const QString &enginePath, const QString &scanParameter) {
     emit addNewEngine_signal(enginePath, scanParameter);
 }
@@ -19,6 +27,7 @@ void Core::init(const QString &settingsFilePath) {
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
     connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot);
     connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleResult_slot);
+    connect(this, &Core::removeEngines_signal, engineHandler, &EngineHandler::deleteEngineHandler_slot);
     engineHandler->start();
 
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
@@ -28,7 +37,7 @@ void Core::init(const QString &settingsFilePath) {
 }
 
 void Core::handleResult_slot(QJsonObject result) {
-    qDebug() << "[CORE]\t" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Indented);
+    qDebug() << "[CORE]\t" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
 }
 
 void Core::run() {

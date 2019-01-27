@@ -24,9 +24,8 @@ private:
 
 	QMap<int, Engine*> *engineList;
 	QMap<QString, int> enginePathList;
-	int engineCount = 0;
-
 	QMap<QString, QJsonArray*> *resultArray;
+	int engineCount = 0;
 
 public slots:
 	void handleEngineResult_slot(QJsonObject result);
