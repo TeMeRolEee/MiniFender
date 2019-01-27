@@ -9,7 +9,7 @@
 class Engine : public QThread {
 Q_OBJECT
 public:
-    Engine(int id, const QString &enginePath);
+    Engine(int id, const QString &enginePath, const QString &scanParameter);
 
     ~Engine() override;
 
@@ -23,6 +23,7 @@ private:
     int workerCount = 0;
 
     QString enginePath;
+    QString scanParameter;
 
 private:
     QMap<int, WorkerThread *> *engineProcesses;
@@ -33,12 +34,12 @@ public slots:
 
     void startEngine_slot(int id);
 
-    void addNewWorker_slot(QStringList params);
+    void addNewWorker_slot(const QString &parameter);
 
     void deleteEngine_slot();
 
 signals:
-    void addNewWorker_signal(QStringList params);
+    void addNewWorker_signal(const QString &params);
 
     void processDone_signal(QJsonObject result);
 

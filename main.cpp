@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCommandLineParser>
+#include <QDebug>
 #include "core.h"
 
 #include "workerthread.h"
@@ -28,44 +29,33 @@ int main(int argc, char *argv[]) {
 
     auto core = std::make_unique<Core>();
 
-    core->init();
+    //qDebug() << QCoreApplication::applicationDirPath();
 
-    core->addNewEngine(enginePath);
+    /*
+     *  Example ini:
+     *  [MoodyEngine]
+     *  path="/home/temerole/Academy/TestEngines/build/TestEngines"
+     *  scan_parameter="-s"
+     *  [TestingEngine]
+     *  path="/home/temerole/Academy/TestEngines/build/TestEngines"
+     *  scan_parameter="-s"
+     */
+
+    core->init(QCoreApplication::applicationDirPath() + "/settings/settings.ini");
+
+    //core->addNewEngine(enginePath, "-s");
 
     core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
-    /*auto engine = new Engine(1, enginePath);
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
-    engine->start();
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
-    engine->addNewWorker_slot(params);
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
-	engine->startEngine_slot(0);
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
-	// getting a little crazy
-
-    engine->addNewWorker_slot(params);
-
-	engine->startEngine_slot(1);
-
-    engine->addNewWorker_slot(params);
-
-	engine->startEngine_slot(2);
-
-    engine->addNewWorker_slot(params);
-
-	engine->startEngine_slot(3);
-
-    engine->addNewWorker_slot(params);
-
-	engine->startEngine_slot(4);
-
-    engine->addNewWorker_slot(params);
-
-	engine->startEngine_slot(5);
-
-	engine->startEngine_signal();*/
-
+	core->listEngineCount();
 
 	return QCoreApplication::exec();
 }

@@ -10,12 +10,12 @@ class EngineHandler : public QThread {
 
 public:
 	EngineHandler();
+	~EngineHandler() override;
+
+	int getEngineCount();
 
 protected:
     void run() override;
-
-public:
-    ~EngineHandler() override;
 
 private:
 	void removeEngine(int id);
@@ -26,17 +26,19 @@ private:
 	QMap<QString, int> enginePathList;
 	int engineCount = 0;
 
+	QMap<QString, QJsonArray*> *resultArray;
+
 public slots:
 	void handleEngineResult_slot(QJsonObject result);
 
     void deleteEngineHandler_slot();
 
-    void addNewEngine_slot(const QString &enginePath);
+    void addNewEngine_slot(const QString &enginePath, const QString &scanParameter);
 
-    void handleNewTask_slot(QMap<QString, QStringList> taskList);
+    void handleNewTask_slot(const QString &task);
 
 signals:
-    //void addNewTask_signal(QStringList &params);
+    void scanComplete_signal(QJsonObject resultData);
 };
 
 

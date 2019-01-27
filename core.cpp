@@ -4,20 +4,27 @@
 
 #include <QDebug>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QSettings>
 
-void Core::addNewEngine(const QString &enginePath) {
-    emit addNewEngine_signal(enginePath);
+void Core::addNewEngine(const QString &enginePath, const QString &scanParameter) {
+    emit addNewEngine_signal(enginePath, scanParameter);
 }
 
-void Core::init() {
+void Core::init(const QString &settingsFilePath) {
     qDebug() << "[CORE]\t" << "Starting the core...";
     this->start(Priority::HighestPriority);
     qDebug() << "[CORE]\t" << "Started the core...\t threadID is:" << QThread::currentThreadId();
+
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
     connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot);
-    //connect(engineHandler, &EngineHandler::reportResult_signal, this, &Core::handleResult_slot);
+    connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleResult_slot);
     engineHandler->start();
+
+    qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
+    settingsFile = settingsFilePath;
+    readSettings();
+    qDebug() << "[CORE]\t" << "Settings loaded";
 }
 
 void Core::handleResult_slot(QJsonObject result) {
@@ -29,12 +36,25 @@ void Core::run() {
 }
 
 void Core::startNewScanTask(const QString filePath) {
-    QStringList params;
-    params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
-    QString enginePath("/home/temerole/Academy/TestEngines/build/TestEngines");
+    emit startNewScanTask_signal(filePath);
+}
 
-    QMap<QString, QStringList> list;
-    list.insert(enginePath, params);
+void Core::readSettings() {
+    QSettings settings(settingsFile, QSettings::IniFormat);
+    QStringList keys = settings.childGroups();
+    for (const auto &groupName : keys) {
+        qDebug() << "[CORE]\t" << groupName;
+        settings.beginGroup(groupName);
+        QStringList engineData;
+        for (const auto &key : settings.childKeys()) {
+            qDebug() << "[CORE]\t" << "KEY:\t" << key << "SETTING IS:\t" << settings.value(key).toString();
+            engineData.append(settings.value(key).toString());
+        }
+        settings.endGroup();
+        addNewEngine(engineData[0], engineData[1]);
+    }
+}
 
-    emit startNewScanTask_signal(list);
+void Core::listEngineCount() {
+    qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
 }
