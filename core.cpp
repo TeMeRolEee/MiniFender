@@ -50,8 +50,12 @@ void Core::startNewScanTask(const QString filePath) {
 void Core::readSettings() {
     QSettings settings(settingsFile, QSettings::IniFormat);
     QStringList keys = settings.childGroups();
-    qDebug() << "[CORE]\t" << keys.count();
-    for (const auto &key : keys) {
-        qDebug() << "[CORE]\t" << "SETTING KEY IS:\t" << key;
+    for (const auto &groupName : keys) {
+        qDebug() << "[CORE]\t" << groupName;
+        settings.beginGroup(groupName);
+        for (const auto &key : settings.childKeys()) {
+            qDebug() << "[CORE]\t" << "KEY:\t" << key << "SETTING IS:\t" << settings.value(key).toString();
+        }
+        settings.endGroup();
     }
 }
