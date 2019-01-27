@@ -54,3 +54,7 @@ void Core::readSettings() {
         addNewEngine(engineData[0], engineData[1]);
     }
 }
+
+void Core::listEngineCount() {
+    qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
+}

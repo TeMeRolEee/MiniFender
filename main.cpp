@@ -47,5 +47,15 @@ int main(int argc, char *argv[]) {
 
     core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
+
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
+
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
+
+	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
+
+	core->listEngineCount();
+
 	return QCoreApplication::exec();
 }

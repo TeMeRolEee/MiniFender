@@ -82,3 +82,7 @@ bool EngineHandler::findExistingEngine(const QString &enginePath) {
 	}
 	return false;
 }
+
+int EngineHandler::getEngineCount() {
+	return engineList->count();
+}

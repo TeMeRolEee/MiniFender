@@ -13,6 +13,8 @@ public:
 
 	void startNewScanTask(QString filePath);
 
+	void listEngineCount();
+
 protected:
 	void run() override;
 

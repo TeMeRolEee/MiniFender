@@ -10,12 +10,12 @@ class EngineHandler : public QThread {
 
 public:
 	EngineHandler();
+	~EngineHandler() override;
+
+	int getEngineCount();
 
 protected:
     void run() override;
-
-public:
-    ~EngineHandler() override;
 
 private:
 	void removeEngine(int id);
