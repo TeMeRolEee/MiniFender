@@ -3,8 +3,8 @@
 
 #include "engine.h"
 
-Engine::Engine(int id, const QString &enginePath)
-        : id(id), enginePath(enginePath) {
+Engine::Engine(int id, const QString &enginePath, const QString &scanParameter)
+        : id(id), enginePath(enginePath), scanParameter(scanParameter) {
     qDebug() << "[ENGINE]\t" << enginePath << id;
 
     engineProcesses = new QMap<int, WorkerThread*>();
@@ -30,9 +30,9 @@ void Engine::handleProcessDone_slot(QJsonObject result) {
     emit processDone_signal(result);
 }
 
-void Engine::addNewWorker_slot(QStringList params) {
-    if (!params.isEmpty()) {
-        auto *workerThread = new WorkerThread(enginePath, params);
+void Engine::addNewWorker_slot(const QString &parameter) {
+    if (!parameter.isEmpty()) {
+        auto *workerThread = new WorkerThread(enginePath, QStringList() << scanParameter << parameter);
 
         qDebug() << "[ENGINE]\t" << "WorkerThread created.";
         engineProcesses->insert(workerCount++, workerThread);

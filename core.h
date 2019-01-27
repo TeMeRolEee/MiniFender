@@ -9,7 +9,7 @@ Q_OBJECT
 public:
     void init(const QString &settingsFilePath);
 
-	void addNewEngine(const QString &enginePath);
+	void addNewEngine(const QString &enginePath, const QString &scanParameter);
 
 	void startNewScanTask(QString filePath);
 
@@ -27,9 +27,9 @@ private slots:
     void handleResult_slot(QJsonObject result);
 
 signals:
-	void addNewEngine_signal(const QString &enginePath);
+	void addNewEngine_signal(const QString &engineData, const QString &scanParameter);
 
-    void startNewScanTask_signal(QMap<QString, QStringList> taskList);
+    void startNewScanTask_signal(QString task);
 
     //void reportResult_signal(QJsonArray results);
 

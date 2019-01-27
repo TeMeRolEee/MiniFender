@@ -33,9 +33,9 @@ public slots:
 
     void deleteEngineHandler_slot();
 
-    void addNewEngine_slot(const QString &enginePath);
+    void addNewEngine_slot(const QString &enginePath, const QString &scanParameter);
 
-    void handleNewTask_slot(QMap<QString, QStringList> taskList);
+    void handleNewTask_slot(const QString &task);
 
 signals:
     void scanComplete_signal(QJsonObject resultData);
