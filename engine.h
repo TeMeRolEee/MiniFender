@@ -30,9 +30,7 @@ private:
 
 public slots:
 
-    void handleProcessDone_slot(QJsonObject result);
-
-    void startEngine_slot(int id);
+    void handleProcessDone_slot(int id, QJsonObject result);
 
     void addNewWorker_slot(const QString &parameter);
 
