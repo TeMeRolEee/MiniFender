@@ -19,17 +19,13 @@ int main(int argc, char *argv[]) {
 	parser.addHelpOption();
 	parser.addVersionOption();
 
-    QStringList params;
-
-    params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
-
-    QString enginePath("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-    //auto workerThread = std::make_unique<WorkerThread>(enginePath, params);
-
-    auto core = std::make_unique<Core>();
-
-    //qDebug() << QCoreApplication::applicationDirPath();
+	/*
+    *   QStringList params;
+    *
+    *   params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
+    *
+    *   QString enginePath("/home/temerole/Academy/TestEngines/build/TestEngines");
+    */
 
     /*
      *  Example ini:
@@ -41,9 +37,11 @@ int main(int argc, char *argv[]) {
      *  scan_parameter="-s"
      */
 
-    core->init(QCoreApplication::applicationDirPath() + "/settings/settings.ini");
+    auto core = std::make_unique<Core>();
 
-    //core->addNewEngine(enginePath, "-s");
+    QString rootDir = QCoreApplication::applicationDirPath();
+
+    core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite");
 
     core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
