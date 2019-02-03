@@ -13,9 +13,7 @@ public:
 
     bool addScanData(const QJsonObject data);
 
-    QJsonObject getLatestScanData();
-
-    QJsonArray getHistory(int lastX);
+    QJsonArray getHistory(int lastX = 1);
 
 private:
     QString dataBaseFilePath;

@@ -31,6 +31,8 @@ void Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
         counter++;
     }
 
+    dbManager->getHistory();
+
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
     connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot);
