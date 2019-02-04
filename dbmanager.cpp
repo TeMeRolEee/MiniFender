@@ -27,7 +27,7 @@ bool DBManager::init() {
     return false;
 }
 
-QJsonArray DBManager::getHistory(int lastX) {
+QJsonArray DBManager::getLastXScan(int lastX) {
 
 
     if (database.open()) {

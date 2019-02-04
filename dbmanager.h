@@ -11,9 +11,9 @@ public:
 
     bool init();
 
-    bool addScanData(const QJsonObject data);
+    bool addScanData(const QJsonObject &data);
 
-    QJsonArray getHistory(int lastX = 1);
+    QJsonArray getLastXScan(int lastX = 1);
 
 private:
     QString dataBaseFilePath;

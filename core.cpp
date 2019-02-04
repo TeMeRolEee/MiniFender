@@ -15,8 +15,8 @@ Core::~Core() {
     delete dbManager;
 }
 
-void Core::addNewEngine(const QString &enginePath, const QString &scanParameter) {
-    emit addNewEngine_signal(enginePath, scanParameter);
+void Core::addNewEngine(const QString &enginePath, const QString &scanParameter, const QString &engineName) {
+    emit addNewEngine_signal(enginePath, scanParameter, engineName);
 }
 
 void Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
@@ -31,7 +31,7 @@ void Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
         counter++;
     }
 
-    dbManager->getHistory();
+    dbManager->getLastXScan();
 
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
@@ -70,7 +70,7 @@ void Core::readSettings() {
             engineData.append(settings.value(key).toString());
         }
         settings.endGroup();
-        addNewEngine(engineData[0], engineData[1]);
+        emit addNewEngine_signal(engineData[0], engineData[1], groupName);
     }
 }
 

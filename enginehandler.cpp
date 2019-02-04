@@ -40,34 +40,29 @@ void EngineHandler::deleteEngineHandler_slot() {
 	}
 }
 
-void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &scanParameter) {
-	if (!enginePath.isEmpty() && !findExistingEngine(enginePath)) {
+void
+EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &scanParameter, const QString &engineName) {
+	if (!enginePath.isEmpty() && !findExistingEngine(engineName)) {
 		qDebug() << "[ENGINE_HANDLER]\t" << "ADDING ENGINE:\t" << engineCount;
 
 		auto engine = new Engine(engineCount, enginePath, scanParameter);
 		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot);
+		connect(this, &EngineHandler::newTask_signal, engine, &Engine::addNewWorker_slot);
 		engineList->insert(engineCount, engine);
-		enginePathList.insert(enginePath, engineCount++);
+		engineNameList.insert(engineName, engineCount++);
 		engine->start();
 	}
 }
 
-void EngineHandler::handleNewTask_slot(const QString &task) {
+void EngineHandler::handleNewTask_slot(const QString &file) {
 	qDebug() << "[ENGINE_HANDLER]\t" << "ENGINE_COUNT:\t" << engineList->count();
-	if (!task.isEmpty()) {
-		for (auto engineID : engineList->keys()) {
-			emit engineList->value(engineID)->addNewWorker_signal(task);
-		}
+	if (!file.isEmpty()) {
+		emit newTask_signal(file);
 	}
 }
 
-bool EngineHandler::findExistingEngine(const QString &enginePath) {
-	for (const auto &engine : enginePathList.keys()) {
-		if (enginePath == engine) {
-			return true;
-		}
-	}
-	return false;
+bool EngineHandler::findExistingEngine(const QString &engineName) {
+	return engineNameList.find(engineName) != engineNameList.end();
 }
 
 int EngineHandler::getEngineCount() {

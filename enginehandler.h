@@ -20,10 +20,10 @@ protected:
 private:
 	void removeEngine(int id);
 
-	bool findExistingEngine(const QString &enginePath);
+	bool findExistingEngine(const QString &engineName);
 
 	QMap<int, Engine*> *engineList;
-	QMap<QString, int> enginePathList;
+	QMap<QString, int> engineNameList;
 	QMap<QString, QJsonArray*> *resultArray;
 	int engineCount = 0;
 
@@ -32,12 +32,14 @@ public slots:
 
     void deleteEngineHandler_slot();
 
-    void addNewEngine_slot(const QString &enginePath, const QString &scanParameter);
+    void addNewEngine_slot(const QString &enginePath, const QString &scanParameter, const QString &engineName);
 
-    void handleNewTask_slot(const QString &task);
+    void handleNewTask_slot(const QString &file);
 
 signals:
     void scanComplete_signal(QJsonObject resultData);
+
+    void newTask_signal(const QString &file);
 };
 
 
