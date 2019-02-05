@@ -22,9 +22,7 @@ protected:
 	void run() override;
 
 private:
-    QString settingsFile;
-
-    void readSettings();
+    void readSettings(const QString &filePath);
 
 	EngineHandler *engineHandler;
 

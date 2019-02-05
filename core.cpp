@@ -35,14 +35,13 @@ void Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
 
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
-    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot);
+    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot, Qt::QueuedConnection);
     connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleResult_slot);
     connect(this, &Core::removeEngines_signal, engineHandler, &EngineHandler::deleteEngineHandler_slot);
     engineHandler->start();
 
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
-    settingsFile = settingsFilePath;
-    readSettings();
+    readSettings(settingsFilePath);
     qDebug() << "[CORE]\t" << "Settings loaded";
 }
 
@@ -58,8 +57,8 @@ void Core::startNewScanTask(const QString filePath) {
     emit startNewScanTask_signal(filePath);
 }
 
-void Core::readSettings() {
-    QSettings settings(settingsFile, QSettings::IniFormat);
+void Core::readSettings(const QString &filePath) {
+    QSettings settings(filePath, QSettings::IniFormat);
     QStringList keys = settings.childGroups();
     for (const auto &groupName : keys) {
         qDebug() << "[CORE]\t" << groupName;

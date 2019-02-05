@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCommandLineParser>
 #include <QDebug>
+#include <QtCore/QDir>
 #include "core.h"
 
 #include "workerthread.h"
@@ -40,6 +41,14 @@ int main(int argc, char *argv[]) {
     auto core = std::make_unique<Core>();
 
     QString rootDir = QCoreApplication::applicationDirPath();
+
+    if (!QDir(rootDir + "/db/").exists()) {
+		QDir().mkdir(rootDir + "/db/");
+    }
+
+	if (!QDir(rootDir + "/settings/").exists()) {
+		QDir().mkdir(rootDir + "/settings/");
+	}
 
     core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite");
 
