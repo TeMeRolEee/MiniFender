@@ -28,8 +28,6 @@ bool DBManager::init() {
 }
 
 QJsonArray DBManager::getLastXScan(int lastX) {
-
-
     if (database.open()) {
         QSqlQuery query;
         query.prepare("SELECT scanResult, engineResults, scanDate FROM scanHistory ORDER BY id DESC LIMIT (:limit)");
@@ -53,6 +51,22 @@ QJsonArray DBManager::getLastXScan(int lastX) {
         database.close();
     }
     return QJsonArray();
+}
+
+bool DBManager::addScanData(const QJsonObject &data) {
+    if (!data.isEmpty() && database.open()) {
+        QSqlQuery dbQuery;
+
+        dbQuery.prepare("INSERT INTO users (scanResult, engineResults, scanDate) VALUES (:scanResult), (:engineResults), (:scanDate)");
+        dbQuery.bindValue(":scanResult", data.value("scanResult").toInt());
+        dbQuery.bindValue(":engineResults", data.value("engineResults").toString());
+        dbQuery.bindValue(":scanDate", data.value("scanDate").toInt());
+
+        bool queryResult = dbQuery.exec();
+        database.close();
+        return queryResult;
+    }
+    return false;
 }
 
 
