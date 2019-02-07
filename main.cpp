@@ -13,7 +13,7 @@
 int main(int argc, char *argv[]) {
 	QCoreApplication app(argc, argv);
 	QCoreApplication::setApplicationName("MiniFender");
-	QCoreApplication::setApplicationVersion("0.2");
+	QCoreApplication::setApplicationVersion("0.5");
 
 	QCommandLineParser parser;
 	parser.setApplicationDescription("Handles multiple scan engines");
@@ -50,7 +50,9 @@ int main(int argc, char *argv[]) {
 		QDir().mkdir(rootDir + "/settings/");
 	}
 
-    core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite");
+    if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
+		QCoreApplication::exit(1);
+    }
 
     core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 

@@ -10,7 +10,7 @@ Q_OBJECT
 public:
 	~Core();
 
-    void init(const QString &settingsFilePath, const QString &dbFilePath);
+    bool init(const QString &settingsFilePath, const QString &dbFilePath);
 
 	void addNewEngine(const QString &enginePath, const QString &scanParameter, const QString &engineName);
 

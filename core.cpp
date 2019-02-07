@@ -19,19 +19,19 @@ void Core::addNewEngine(const QString &enginePath, const QString &scanParameter,
     emit addNewEngine_signal(enginePath, scanParameter, engineName);
 }
 
-void Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
+bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     qDebug() << "[CORE]\t" << "Starting the core...";
     this->start(Priority::HighestPriority);
     qDebug() << "[CORE]\t" << "Started the core...\t threadID is:" << QThread::currentThreadId();
 
     qDebug() << "[CORE]\t" << "Connecting to database";
     dbManager = new DBManager(dbFilePath);
-    int counter = 0;
-    while (counter <= 4 && !dbManager->init()) {
-        counter++;
+    if (!dbManager->init()) {
+        qDebug() << "[CORE]\t" << "Exiting...";
+        return false;
     }
 
-    dbManager->getLastXScan();
+    //dbManager->getLastXScan();
 
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
@@ -43,6 +43,7 @@ void Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
     readSettings(settingsFilePath);
     qDebug() << "[CORE]\t" << "Settings loaded";
+    return true;
 }
 
 void Core::handleResult_slot(QJsonObject result) {
