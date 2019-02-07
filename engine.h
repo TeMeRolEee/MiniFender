@@ -37,7 +37,7 @@ public slots:
     void deleteEngine_slot();
 
 signals:
-    void addNewWorker_signal(const QString &params);
+    void addNewWorker_signal(const QString &file);
 
     void processDone_signal(QJsonObject result);
 

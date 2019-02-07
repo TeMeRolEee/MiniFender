@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCommandLineParser>
 #include <QDebug>
+#include <QtCore/QDir>
 #include "core.h"
 
 #include "workerthread.h"
@@ -12,24 +13,20 @@
 int main(int argc, char *argv[]) {
 	QCoreApplication app(argc, argv);
 	QCoreApplication::setApplicationName("MiniFender");
-	QCoreApplication::setApplicationVersion("0.2");
+	QCoreApplication::setApplicationVersion("0.5");
 
 	QCommandLineParser parser;
 	parser.setApplicationDescription("Handles multiple scan engines");
 	parser.addHelpOption();
 	parser.addVersionOption();
 
-    QStringList params;
-
-    params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
-
-    QString enginePath("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-    //auto workerThread = std::make_unique<WorkerThread>(enginePath, params);
-
-    auto core = std::make_unique<Core>();
-
-    //qDebug() << QCoreApplication::applicationDirPath();
+	/*
+    *   QStringList params;
+    *
+    *   params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
+    *
+    *   QString enginePath("/home/temerole/Academy/TestEngines/build/TestEngines");
+    */
 
     /*
      *  Example ini:
@@ -41,9 +38,21 @@ int main(int argc, char *argv[]) {
      *  scan_parameter="-s"
      */
 
-    core->init(QCoreApplication::applicationDirPath() + "/settings/settings.ini");
+    auto core = std::make_unique<Core>();
 
-    //core->addNewEngine(enginePath, "-s");
+    QString rootDir = QCoreApplication::applicationDirPath();
+
+    if (!QDir(rootDir + "/db/").exists()) {
+		QDir().mkdir(rootDir + "/db/");
+    }
+
+	if (!QDir(rootDir + "/settings/").exists()) {
+		QDir().mkdir(rootDir + "/settings/");
+	}
+
+    if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
+		QCoreApplication::exit(1);
+    }
 
     core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 

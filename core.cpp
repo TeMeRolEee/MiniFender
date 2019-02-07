@@ -12,28 +12,38 @@ Core::~Core() {
     engineHandler->wait();
 
     delete engineHandler;
+    delete dbManager;
 }
 
-void Core::addNewEngine(const QString &enginePath, const QString &scanParameter) {
-    emit addNewEngine_signal(enginePath, scanParameter);
+void Core::addNewEngine(const QString &enginePath, const QString &scanParameter, const QString &engineName) {
+    emit addNewEngine_signal(enginePath, scanParameter, engineName);
 }
 
-void Core::init(const QString &settingsFilePath) {
+bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     qDebug() << "[CORE]\t" << "Starting the core...";
     this->start(Priority::HighestPriority);
     qDebug() << "[CORE]\t" << "Started the core...\t threadID is:" << QThread::currentThreadId();
 
+    qDebug() << "[CORE]\t" << "Connecting to database";
+    dbManager = new DBManager(dbFilePath);
+    if (!dbManager->init()) {
+        qDebug() << "[CORE]\t" << "Exiting...";
+        return false;
+    }
+
+    //dbManager->getLastXScan();
+
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
-    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot);
+    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot, Qt::QueuedConnection);
     connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleResult_slot);
     connect(this, &Core::removeEngines_signal, engineHandler, &EngineHandler::deleteEngineHandler_slot);
     engineHandler->start();
 
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
-    settingsFile = settingsFilePath;
-    readSettings();
+    readSettings(settingsFilePath);
     qDebug() << "[CORE]\t" << "Settings loaded";
+    return true;
 }
 
 void Core::handleResult_slot(QJsonObject result) {
@@ -48,8 +58,8 @@ void Core::startNewScanTask(const QString filePath) {
     emit startNewScanTask_signal(filePath);
 }
 
-void Core::readSettings() {
-    QSettings settings(settingsFile, QSettings::IniFormat);
+void Core::readSettings(const QString &filePath) {
+    QSettings settings(filePath, QSettings::IniFormat);
     QStringList keys = settings.childGroups();
     for (const auto &groupName : keys) {
         qDebug() << "[CORE]\t" << groupName;
@@ -60,7 +70,7 @@ void Core::readSettings() {
             engineData.append(settings.value(key).toString());
         }
         settings.endGroup();
-        addNewEngine(engineData[0], engineData[1]);
+        emit addNewEngine_signal(engineData[0], engineData[1], groupName);
     }
 }
 
