@@ -5,12 +5,17 @@
 #include <QDebug>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QSettings>
+#include <QtCore/QFile>
 
 Core::~Core() {
     emit removeEngines_signal();
+
     engineHandler->quit();
     engineHandler->wait();
+    cliHandler->quit();
+    cliHandler->wait();
 
+    delete cliHandler;
     delete engineHandler;
     delete dbManager;
 }
@@ -31,8 +36,6 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
         return false;
     }
 
-    //dbManager->getLastXScan();
-
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
     connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot, Qt::QueuedConnection);
@@ -43,6 +46,16 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
     readSettings(settingsFilePath);
     qDebug() << "[CORE]\t" << "Settings loaded";
+
+    qDebug() << "[CORE]\t" << "Starting CLI handler";
+    cliHandler = new CliHandler();
+    connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot);
+    cliHandler->start();
+
+    emit cliHandler->startListening_signal();
+
+    listEngineCount();
+
     return true;
 }
 
@@ -76,4 +89,14 @@ void Core::readSettings(const QString &filePath) {
 
 void Core::listEngineCount() {
     qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
+}
+
+void Core::handleNewTask_slot(QString input) {
+    if (QFile::exists(input)) {
+        qDebug() << "[CORE]\t" << "file is:\t" << input;
+        emit startNewScanTask_signal(input);
+        qDebug() << "[CORE]\t" << "Valid file received, passing to the engines";
+    } else {
+        qCritical()  << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
+    }
 }

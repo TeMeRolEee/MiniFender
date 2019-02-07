@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
 		QCoreApplication::exit(1);
     }
-
+/*
     core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
 	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
@@ -63,8 +63,7 @@ int main(int argc, char *argv[]) {
 	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
 
 	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-	core->listEngineCount();
+*/
 
 	return QCoreApplication::exec();
 }
