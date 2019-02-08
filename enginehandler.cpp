@@ -9,6 +9,7 @@
 EngineHandler::EngineHandler() {
     engineList = new QMap<int, Engine*>();
     resultMap = new QMap<QString, QJsonArray*>();
+    scanIdList = new QVector<int>();
 }
 
 EngineHandler::~EngineHandler() {
@@ -57,7 +58,8 @@ EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &scanP
 void EngineHandler::handleNewTask_slot(const QString &file) {
 	qDebug() << "[ENGINE_HANDLER]\t" << "ENGINE_COUNT:\t" << engineList->count();
 	if (!file.isEmpty()) {
-		emit newTask_signal(file);
+		scanIdList->push_back(scanId);
+		emit newTask_signal(scanId++, file);
 	}
 }
 

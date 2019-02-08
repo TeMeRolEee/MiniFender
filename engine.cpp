@@ -32,7 +32,7 @@ void Engine::handleProcessDone_slot(int id, QJsonObject result) {
     emit processDone_signal(result);
 }
 
-void Engine::addNewWorker_slot(const QString &parameter) {
+void Engine::addNewWorker_slot(int scanId, const QString &parameter) {
     if (!parameter.isEmpty()) {
         auto *workerThread = new WorkerThread(workerCount, enginePath, QStringList() << scanParameter << parameter);
 

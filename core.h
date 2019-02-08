@@ -13,11 +13,7 @@ public:
 
     bool init(const QString &settingsFilePath, const QString &dbFilePath);
 
-	void addNewEngine(const QString &enginePath, const QString &scanParameter, const QString &engineName);
-
-	void startNewScanTask(QString filePath);
-
-	void listEngineCount();
+    void listEngineCount();
 
 protected:
 	void run() override;

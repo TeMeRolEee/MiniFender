@@ -20,10 +20,6 @@ Core::~Core() {
     delete dbManager;
 }
 
-void Core::addNewEngine(const QString &enginePath, const QString &scanParameter, const QString &engineName) {
-    emit addNewEngine_signal(enginePath, scanParameter, engineName);
-}
-
 bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     qDebug() << "[CORE]\t" << "Starting the core...";
     this->start(Priority::HighestPriority);
@@ -65,10 +61,6 @@ void Core::handleResult_slot(QJsonObject result) {
 
 void Core::run() {
     QThread::run();
-}
-
-void Core::startNewScanTask(const QString filePath) {
-    emit startNewScanTask_signal(filePath);
 }
 
 void Core::readSettings(const QString &filePath) {

@@ -25,6 +25,8 @@ private:
 	QMap<int, Engine*> *engineList;
 	QMap<QString, int> engineNameList;
 	QMap<QString, QJsonArray*> *resultMap;
+	QVector<int> *scanIdList;
+	int scanId = 0;
 	int engineCount = 0;
 
 public slots:
@@ -39,7 +41,7 @@ public slots:
 signals:
     void scanComplete_signal(QJsonObject resultData);
 
-    void newTask_signal(const QString &file);
+    void newTask_signal(int id, const QString &file);
 };
 
 

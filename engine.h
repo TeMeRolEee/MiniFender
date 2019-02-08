@@ -32,7 +32,7 @@ public slots:
 
     void handleProcessDone_slot(int id, QJsonObject result);
 
-    void addNewWorker_slot(const QString &parameter);
+    void addNewWorker_slot(int scanId, const QString &parameter);
 
     void deleteEngine_slot();
 

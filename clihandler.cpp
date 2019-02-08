@@ -6,7 +6,7 @@
 CliHandler::CliHandler() {
     connect(this, &CliHandler::startListening_signal, this, &CliHandler::startListening_slot);
     connect(this, &CliHandler::stopListening_signal, this , &CliHandler::stopListening_slot);
-
+    init();
 }
 
 void CliHandler::run() {
@@ -20,7 +20,7 @@ void CliHandler::run() {
 }
 
 void CliHandler::startListening_slot() {
-    init();
+
 }
 
 void CliHandler::stopListening_slot() {
