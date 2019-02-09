@@ -44,6 +44,7 @@ void Engine::addNewWorker_slot(int scanId, const QString &parameter) {
 
         connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot);
         connect(this, &Engine::startEngine_signal, workerThread, &WorkerThread::startWorker_slot);
+        connect(workerThread, &WorkerThread::finished, workerThread, &WorkerThread::deleteLater);
         emit workerThread->startWorker_signal();
     }
 }
@@ -54,6 +55,7 @@ void Engine::deleteEngine_slot() {
         engineProcesses->value(worker)->wait();
         delete engineProcesses->take(worker);
     }
+    emit deletingDone_signal(id);
 }
 
 const QString &Engine::getEnginePath() const {

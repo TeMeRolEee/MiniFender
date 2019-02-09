@@ -4,6 +4,8 @@
 #include <QtCore/QProcess>
 #include <QtCore/QJsonObject>
 #include <QtCore/QMap>
+#include <QUuid>
+
 #include "workerthread.h"
 
 class Engine : public QThread {
@@ -44,5 +46,7 @@ signals:
     void startEngine_signal();
 
     void deleteEngine_signal();
+
+    void deletingDone_signal(int id);
 };
 

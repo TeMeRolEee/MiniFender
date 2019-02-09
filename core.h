@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QUuid>
 
 #include "enginehandler.h"
 #include "dbmanager.h"
@@ -27,6 +28,10 @@ private:
 
 	CliHandler *cliHandler;
 
+	QMap<QUuid, QJsonObject> *scanMap;
+
+	bool deleteReady = false;
+
 private slots:
     void handleResult_slot(QJsonObject result);
 
@@ -35,10 +40,8 @@ private slots:
 signals:
 	void addNewEngine_signal(const QString &enginePath, const QString &scanParameter, const QString &engineName);
 
-    void startNewScanTask_signal(QString file);
+    void startNewScanTask_signal(QUuid uniqueId, QString file);
 
     void removeEngines_signal();
-
-
 };
 

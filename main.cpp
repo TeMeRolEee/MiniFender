@@ -31,9 +31,11 @@ int main(int argc, char *argv[]) {
 	if (!QDir(rootDir + "/settings/").exists()) {
 		QDir().mkdir(rootDir + "/settings/");
 	}
-
+	core->start();
 	if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
 		qDebug() << "SHUTTING DOWN";
+		QCoreApplication::exit(1);
+		QCoreApplication::quit();
 		return 1;
 	}
 

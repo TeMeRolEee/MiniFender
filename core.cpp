@@ -9,7 +9,7 @@
 #include <QtCore/QMap>
 
 Core::~Core() {
-    emit removeEngines_signal();
+    //emit removeEngines_signal();
 
     engineHandler->quit();
     engineHandler->wait();
@@ -19,11 +19,13 @@ Core::~Core() {
     delete cliHandler;
     delete engineHandler;
     delete dbManager;
+    delete scanMap;
 }
 
 bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
+    connect(this, &Core::finished, this, &Core::deleteLater);
     qDebug() << "[CORE]\t" << "Starting the core...";
-    this->start(Priority::HighestPriority);
+    //this->start(Priority::HighestPriority);
     qDebug() << "[CORE]\t" << "Started the core...\t threadID is:" << QThread::currentThreadId();
 
     qDebug() << "[CORE]\t" << "Connecting to database";
@@ -33,11 +35,13 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
         return false;
     }
 
+    scanMap = new QMap<QUuid, QJsonObject>();
+
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
     connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot, Qt::QueuedConnection);
     connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleResult_slot);
-    connect(this, &Core::removeEngines_signal, engineHandler, &EngineHandler::deleteEngineHandler_slot);
+    connect(engineHandler, &EngineHandler::finished, engineHandler, &EngineHandler::deleteLater);
     engineHandler->start();
 
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
@@ -50,6 +54,7 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     qDebug() << "[CORE]\t" << "Starting CLI handler";
     cliHandler = new CliHandler();
     connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot);
+    connect(cliHandler, &CliHandler::finished, cliHandler, &CliHandler::deleteLater);
     cliHandler->start();
 
     emit cliHandler->startListening_signal();
@@ -108,9 +113,10 @@ void Core::listEngineCount() {
 void Core::handleNewTask_slot(QString input) {
     if (QFile::exists(input)) {
         qDebug() << "[CORE]\t" << "file is:\t" << input;
-        emit startNewScanTask_signal(input);
+        emit startNewScanTask_signal(QUuid(), input);
         qDebug() << "[CORE]\t" << "Valid file received, passing to the engines";
     } else {
         qCritical()  << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
     }
 }
+

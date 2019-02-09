@@ -15,6 +15,7 @@ EngineHandler::EngineHandler() {
 EngineHandler::~EngineHandler() {
 	delete engineList;
 	delete resultMap;
+	delete scanIdList;
 }
 
 void EngineHandler::run() {
@@ -27,17 +28,9 @@ void EngineHandler::handleEngineResult_slot(QJsonObject result) {
 	emit scanComplete_signal(result);
 }
 
-void EngineHandler::removeEngine(int id) {
-	emit engineList->value(id)->deleteEngine_signal();
-	engineList->value(id)->quit();
-	engineList->value(id)->wait();
-
-	delete engineList->take(id);
-}
-
 void EngineHandler::deleteEngineHandler_slot() {
 	for (auto engineID : engineList->keys()) {
-		removeEngine(engineID);
+		emit engineList->value(engineID)->deleteEngine_signal();
 	}
 }
 
@@ -46,15 +39,17 @@ void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &
 		qDebug() << "[ENGINE_HANDLER]\t" << "ADDING ENGINE:\t" << engineCount;
 
 		auto engine = new Engine(engineCount, enginePath, scanParameter);
-		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot);
-		connect(this, &EngineHandler::newTask_signal, engine, &Engine::addNewWorker_slot);
+		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot, Qt::QueuedConnection);
+		connect(this, &EngineHandler::newTask_signal, engine, &Engine::addNewWorker_slot, Qt::QueuedConnection);
+		connect(engine, &Engine::finished, engine, &Engine::deleteLater);
+		//connect(engine, &Engine::deletingDone_signal, this, &EngineHandler::handleEngineDeletion_slot);
 		engineList->insert(engineCount, engine);
 		engineNameList.insert(engineName, engineCount++);
 		engine->start();
 	}
 }
 
-void EngineHandler::handleNewTask_slot(const QString &file) {
+void EngineHandler::handleNewTask_slot(QUuid uniqueId, const QString &file) {
 	qDebug() << "[ENGINE_HANDLER]\t" << "ENGINE_COUNT:\t" << engineList->count();
 	if (!file.isEmpty()) {
 		scanIdList->push_back(scanId);
@@ -68,4 +63,11 @@ bool EngineHandler::findExistingEngine(const QString &engineName) {
 
 int EngineHandler::getEngineCount() {
 	return engineList->count();
+}
+
+void EngineHandler::handleEngineDeletion_slot(int id) {
+	//engineList->value(id)->quit();
+	//engineList->value(id)->wait();
+
+	//delete engineList->take(id);
 }
