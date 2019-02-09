@@ -19,7 +19,7 @@ protected:
 	void run() override;
 
 private:
-    void readSettings(const QString &filePath);
+    bool readSettings(const QString &filePath);
 
 	EngineHandler *engineHandler;
 

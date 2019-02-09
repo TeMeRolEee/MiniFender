@@ -41,8 +41,7 @@ void EngineHandler::deleteEngineHandler_slot() {
 	}
 }
 
-void
-EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &scanParameter, const QString &engineName) {
+void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &scanParameter, const QString &engineName) {
 	if (!enginePath.isEmpty() && !findExistingEngine(engineName)) {
 		qDebug() << "[ENGINE_HANDLER]\t" << "ADDING ENGINE:\t" << engineCount;
 

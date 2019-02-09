@@ -6,6 +6,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QSettings>
 #include <QtCore/QFile>
+#include <QtCore/QMap>
 
 Core::~Core() {
     emit removeEngines_signal();
@@ -40,7 +41,10 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     engineHandler->start();
 
     qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
-    readSettings(settingsFilePath);
+     if (!readSettings(settingsFilePath)) {
+         qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
+         return false;
+     }
     qDebug() << "[CORE]\t" << "Settings loaded";
 
     qDebug() << "[CORE]\t" << "Starting CLI handler";
@@ -63,20 +67,38 @@ void Core::run() {
     QThread::run();
 }
 
-void Core::readSettings(const QString &filePath) {
+bool Core::readSettings(const QString &filePath) {
+    QVector<QString> badEngines;
     QSettings settings(filePath, QSettings::IniFormat);
     QStringList keys = settings.childGroups();
     for (const auto &groupName : keys) {
         qDebug() << "[CORE]\t" << groupName;
         settings.beginGroup(groupName);
-        QStringList engineData;
-        for (const auto &key : settings.childKeys()) {
-            qDebug() << "[CORE]\t" << "KEY:\t" << key << "SETTING IS:\t" << settings.value(key).toString();
-            engineData.append(settings.value(key).toString());
+        QMap<QString, QString> engineData;
+
+        if (settings.childKeys().contains("path") && settings.childKeys().contains("scan_parameter")) {
+            for (const auto &key : settings.childKeys()) {
+                engineData.insert(key, settings.value(key).toString());
+            }
+            qInfo() << "[CORE]\t" << "Adding engine:" << groupName;
+            emit addNewEngine_signal(engineData.value("path"), engineData.value("scan_parameter"), groupName);
+        } else {
+            badEngines.append(groupName);
+            qWarning() << "[CORE]\t" << "Engine:" << groupName << "cannot be started.\t Skipping";
         }
+
         settings.endGroup();
-        emit addNewEngine_signal(engineData[0], engineData[1], groupName);
+
     }
+    if (badEngines.count() > 0) {
+        QString message = "Engines that could not be loaded:";
+        for (const auto &engine : badEngines) {
+            message.append(" " + engine);
+        }
+        qWarning() << "[CORE]\t" << message;
+    }
+
+    return (badEngines.count() != settings.childGroups().count() && settings.childGroups().count() != 0);
 }
 
 void Core::listEngineCount() {
