@@ -2,11 +2,12 @@
 
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
+#include <QtCore/QUuid>
 
 class WorkerThread : public QThread {
 Q_OBJECT
 public:
-    WorkerThread(int id, const QString &enginePath, const QStringList &paramList);
+    WorkerThread(QUuid id, const QString &enginePath, const QStringList &paramList);
 
     ~WorkerThread();
 
@@ -17,7 +18,7 @@ private:
     QProcess *process;
     QString enginePath;
     QStringList paramList;
-    int id;
+    QUuid id;
 
 public slots:
     void processDone_slot();
@@ -25,7 +26,7 @@ public slots:
     void startWorker_slot();
 
 signals:
-    void processDone_signal(int id, QJsonObject resultArray);
+    void processDone_signal(QUuid id, QJsonObject resultArray);
 
     void startWorker_signal();
 

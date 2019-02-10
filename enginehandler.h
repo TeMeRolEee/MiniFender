@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QProcess>
+#include <QUuid>
 
 #include "engine.h"
 
@@ -18,28 +19,29 @@ protected:
     void run() override;
 
 private:
-	void removeEngine(int id);
 
 	bool findExistingEngine(const QString &engineName);
 
 	QMap<int, Engine*> *engineList;
 	QMap<QString, int> engineNameList;
 	QMap<QString, QJsonArray*> *resultMap;
+	QVector<int> *scanIdList;
 	int engineCount = 0;
 
 public slots:
-	void handleEngineResult_slot(QJsonObject result);
+	void handleEngineResult_slot(QUuid uniqueId, QJsonObject result);
 
     void deleteEngineHandler_slot();
 
     void addNewEngine_slot(const QString &enginePath, const QString &scanParameter, const QString &engineName);
 
-    void handleNewTask_slot(const QString &file);
+    void handleNewTask_slot(QUuid uniqueId, const QString &file);
 
 signals:
-    void scanComplete_signal(QJsonObject resultData);
+    void scanComplete_signal(QUuid id, QJsonObject resultData);
 
-    void newTask_signal(const QString &file);
+    void newTask_signal(QUuid uniqueId, const QString &file);
+
 };
 
 

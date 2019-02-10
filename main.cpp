@@ -20,51 +20,26 @@ int main(int argc, char *argv[]) {
 	parser.addHelpOption();
 	parser.addVersionOption();
 
-	/*
-    *   QStringList params;
-    *
-    *   params  << "-s" << "/home/temerole/Academy/TestEngines/build/TestEngines";
-    *
-    *   QString enginePath("/home/temerole/Academy/TestEngines/build/TestEngines");
-    */
+	auto core = std::make_unique<Core>();
 
-    /*
-     *  Example ini:
-     *  [MoodyEngine]
-     *  path="/home/temerole/Academy/TestEngines/build/TestEngines"
-     *  scan_parameter="-s"
-     *  [TestingEngine]
-     *  path="/home/temerole/Academy/TestEngines/build/TestEngines"
-     *  scan_parameter="-s"
-     */
+	QString rootDir = QCoreApplication::applicationDirPath();
 
-    auto core = std::make_unique<Core>();
-
-    QString rootDir = QCoreApplication::applicationDirPath();
-
-    if (!QDir(rootDir + "/db/").exists()) {
+	if (!QDir(rootDir + "/db/").exists()) {
 		QDir().mkdir(rootDir + "/db/");
-    }
+	}
 
 	if (!QDir(rootDir + "/settings/").exists()) {
 		QDir().mkdir(rootDir + "/settings/");
 	}
-
-    if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
+	core->start();
+	if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
+		qDebug() << "SHUTTING DOWN";
+		core->quit();
+		core->wait();
 		QCoreApplication::exit(1);
-    }
-
-    core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-	core->startNewScanTask("/home/temerole/Academy/TestEngines/build/TestEngines");
-
-	core->listEngineCount();
+		QCoreApplication::quit();
+		return 1;
+	}
 
 	return QCoreApplication::exec();
 }
