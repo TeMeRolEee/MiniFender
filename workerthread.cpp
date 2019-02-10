@@ -1,14 +1,15 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QUuid>
 #include <QDebug>
 
 #include "workerthread.h"
 
-WorkerThread::WorkerThread(int id, const QString &enginePath, const QStringList &paramList) :
+WorkerThread::WorkerThread(QUuid id, const QString &enginePath, const QStringList &paramList) :
         id(id),
         paramList(paramList),
         enginePath(enginePath) {
-    qDebug() << "[WORKER]\t" << "WorkerThread constructor";
+    qDebug() << "[WORKER]\t" << "WorkerThread constructor" << id;
 
     process = new QProcess();
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
@@ -38,7 +39,7 @@ void WorkerThread::processDone_slot() {
 
     QJsonDocument qJsonDocument(object);
 
-    qDebug() << "[WORKER]\t" << qJsonDocument.toJson(QJsonDocument::JsonFormat::Compact);
+    qDebug() << "[WORKER]\t" << id << qJsonDocument.toJson(QJsonDocument::JsonFormat::Compact);
 
     emit processDone_signal(id, object);
 }

@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) {
 	core->start();
 	if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
 		qDebug() << "SHUTTING DOWN";
+		core->quit();
+		core->wait();
 		QCoreApplication::exit(1);
 		QCoreApplication::quit();
 		return 1;

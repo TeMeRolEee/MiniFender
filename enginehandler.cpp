@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QUuid>
 
 #include "enginehandler.h"
 
@@ -23,9 +24,9 @@ void EngineHandler::run() {
 	QThread::run();
 }
 
-void EngineHandler::handleEngineResult_slot(QJsonObject result) {
+void EngineHandler::handleEngineResult_slot(QUuid uniqueId, QJsonObject result) {
 	qDebug() << "[ENGINE_HANDLER]\t" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
-	emit scanComplete_signal(result);
+	emit scanComplete_signal(uniqueId, result);
 }
 
 void EngineHandler::deleteEngineHandler_slot() {
@@ -42,7 +43,6 @@ void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &
 		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot, Qt::QueuedConnection);
 		connect(this, &EngineHandler::newTask_signal, engine, &Engine::addNewWorker_slot, Qt::QueuedConnection);
 		connect(engine, &Engine::finished, engine, &Engine::deleteLater);
-		//connect(engine, &Engine::deletingDone_signal, this, &EngineHandler::handleEngineDeletion_slot);
 		engineList->insert(engineCount, engine);
 		engineNameList.insert(engineName, engineCount++);
 		engine->start();
@@ -52,8 +52,7 @@ void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &
 void EngineHandler::handleNewTask_slot(QUuid uniqueId, const QString &file) {
 	qDebug() << "[ENGINE_HANDLER]\t" << "ENGINE_COUNT:\t" << engineList->count();
 	if (!file.isEmpty()) {
-		scanIdList->push_back(scanId);
-		emit newTask_signal(scanId++, file);
+		emit newTask_signal(uniqueId, file);
 	}
 }
 
@@ -65,9 +64,3 @@ int EngineHandler::getEngineCount() {
 	return engineList->count();
 }
 
-void EngineHandler::handleEngineDeletion_slot(int id) {
-	//engineList->value(id)->quit();
-	//engineList->value(id)->wait();
-
-	//delete engineList->take(id);
-}

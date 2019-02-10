@@ -9,6 +9,7 @@ public:
     CliHandler();
 
     void init();
+
 protected:
     void run() override;
 
@@ -17,15 +18,11 @@ private:
 
 public slots:
 
-    void startListening_slot();
-
     void stopListening_slot();
 
 signals:
     void newTask_signal(const QString &filePath);
-
-    void startListening_signal();
-
+    
     void stopListening_signal();
 };
 

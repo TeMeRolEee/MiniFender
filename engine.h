@@ -22,26 +22,22 @@ protected:
 
 private:
     int id = 0;
-    int workerCount = 0;
 
     QString enginePath;
     QString scanParameter;
 
 private:
-    QMap<int, WorkerThread *> *engineProcesses;
+    QMap<QUuid, WorkerThread *> *engineProcesses;
 
 public slots:
+    void handleProcessDone_slot(QUuid uniqueId, QJsonObject result);
 
-    void handleProcessDone_slot(int id, QJsonObject result);
-
-    void addNewWorker_slot(int scanId, const QString &parameter);
+    void addNewWorker_slot(QUuid uniqueId, const QString &parameter);
 
     void deleteEngine_slot();
 
 signals:
-    void addNewWorker_signal(int scanId, const QString &file);
-
-    void processDone_signal(QJsonObject result);
+    void processDone_signal(QUuid uniqueId, QJsonObject result);
 
     void startEngine_signal();
 

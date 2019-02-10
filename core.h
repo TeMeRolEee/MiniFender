@@ -33,7 +33,7 @@ private:
 	bool deleteReady = false;
 
 private slots:
-    void handleResult_slot(QJsonObject result);
+    void handleResult_slot(QUuid uniqueId, QJsonObject result);
 
     void handleNewTask_slot(QString input);
 

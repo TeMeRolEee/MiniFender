@@ -26,11 +26,10 @@ private:
 	QMap<QString, int> engineNameList;
 	QMap<QString, QJsonArray*> *resultMap;
 	QVector<int> *scanIdList;
-	int scanId = 0;
 	int engineCount = 0;
 
 public slots:
-	void handleEngineResult_slot(QJsonObject result);
+	void handleEngineResult_slot(QUuid uniqueId, QJsonObject result);
 
     void deleteEngineHandler_slot();
 
@@ -38,14 +37,11 @@ public slots:
 
     void handleNewTask_slot(QUuid uniqueId, const QString &file);
 
-    void handleEngineDeletion_slot(int id);
-
 signals:
-    void scanComplete_signal(QJsonObject resultData);
+    void scanComplete_signal(QUuid id, QJsonObject resultData);
 
-    void newTask_signal(int id, const QString &file);
+    void newTask_signal(QUuid uniqueId, const QString &file);
 
-    void deletionDone_signal();
 };
 
 
