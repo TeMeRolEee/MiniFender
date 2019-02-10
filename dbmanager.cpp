@@ -1,7 +1,8 @@
 #include "dbmanager.h"
 
 #include <QDebug>
-#include <QtSql/QSqlQuery>
+#include <QtSql>
+#include <QJsonDocument>
 
 DBManager::DBManager(const QString &path) : dataBaseFilePath(path) {
 
@@ -23,7 +24,7 @@ bool DBManager::init() {
         database.close();
         return (initOkay);
     }
-    qDebug() << "[DBMANAGER]\t" << "Couldn't connect to database";
+    //qDebug() << "[DBMANAGER]\t" << "Couldn't connect to database";
     return false;
 }
 
@@ -44,8 +45,7 @@ QJsonArray DBManager::getLastXScan(int lastX) {
                 }
                 resultArray.insert(resultArray.count(), data);
             }
-
-            qDebug() << "[DBMANAGER]" << resultArray;
+            //qDebug() << "[DBMANAGER]" << resultArray;
             return resultArray;
         }
         database.close();
@@ -56,13 +56,18 @@ QJsonArray DBManager::getLastXScan(int lastX) {
 bool DBManager::addScanData(const QJsonObject &data) {
     if (!data.isEmpty() && database.open()) {
         QSqlQuery dbQuery;
-
-        dbQuery.prepare("INSERT INTO users (scanResult, engineResults, scanDate) VALUES (:scanResult), (:engineResults), (:scanDate)");
+        QJsonObject engines;
+        engines.insert("engineResults", data.value("engineResults"));
+        dbQuery.prepare("INSERT INTO scanHistory (scanResult, engineResults, scanDate) VALUES ((:scanResult), (:engineResults), (:scanDate))");
         dbQuery.bindValue(":scanResult", data.value("scanResult").toInt());
-        dbQuery.bindValue(":engineResults", data.value("engineResults").toString());
+        dbQuery.bindValue(":engineResults", QJsonDocument(engines).toJson(QJsonDocument::JsonFormat::Compact));
         dbQuery.bindValue(":scanDate", data.value("scanDate").toInt());
 
-        bool queryResult = dbQuery.exec();
+        bool queryResult;
+        queryResult = dbQuery.exec();
+        if (!queryResult) {
+            qDebug() << queryResult << dbQuery.lastError();
+        }
         database.close();
         return queryResult;
     }
