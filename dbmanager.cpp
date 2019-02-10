@@ -38,12 +38,13 @@ QJsonArray DBManager::getLastXScan(int lastX) {
         if (query.exec()) {
             while (query.next()) {
                 QJsonObject data;
-                QMapIterator<QString, QVariant> mapIterator(query.boundValues());
-                while (mapIterator.hasNext()) {
-                    mapIterator.next();
-                    data.insert(mapIterator.key(), (const QJsonValue &) mapIterator.value());
-                }
-                resultArray.insert(resultArray.count(), data);
+                int scanResult = query.value(0).toInt();
+                QJsonObject engineResults = query.value(1).toJsonObject();
+                int scanDate = query.value(2).toInt();
+                data.insert("scanResult", scanResult);
+                data.insert("engineResults", engineResults);
+                data.insert("scanDate", scanDate);
+                resultArray.push_back(data);
             }
             //qDebug() << "[DBMANAGER]" << resultArray;
             return resultArray;

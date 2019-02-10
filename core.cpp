@@ -25,11 +25,14 @@ Core::~Core() {
 }
 
 bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
-    connect(this, &Core::startCalculateResult_signal, this, &Core::calculateResult_slot, Qt::QueuedConnection);
+    connect(this, &Core::startCalculateResult_signal, this, &Core::result_slot, Qt::QueuedConnection);
     connect(this, &Core::finished, this, &Core::deleteLater);
+
+    emit startWebServer_signal();
 
     //qDebug() << "[CORE]\t" << "Connecting to database";
     dbManager = new DBManager(dbFilePath);
+
     if (!dbManager->init()) {
         //qDebug() << "[CORE]\t" << "Exiting...";
         return false;
@@ -58,20 +61,26 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
 
     listEngineCount();
 
+    server.Get("/history", [&](const httplib::Request& req, httplib::Response& res) {
+        res.set_content(QJsonDocument(dbManager->getLastXScan(100)).toJson(QJsonDocument::JsonFormat::Compact).toStdString(), "text/plain");
+    });
+
+    server.Get("scan", [&](const httplib::Request& req, httplib::Response& res) {
+        auto numbers = req.matches[1];
+        res.set_content(numbers, "text/plain");
+    });
+
+    server.listen("localhost", 1234);
+
     return true;
 }
 
 void Core::handleEngineResults_slot(QUuid uniqueId, QJsonObject result) {
-    for (auto id : scanMap->keys()) {
-        //qDebug() << "[CORE]\t" << id;
-    }
-    //qDebug() << "[CORE]\t" << uniqueId << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
     if (scanMap->find(uniqueId) != scanMap->end()) {
         scanMap->value(uniqueId)->push_back(result);
     }
-    //qDebug() << "[CORE]\t" << scanMap->value(uniqueId)->count() - 1;
+
     if (scanMap->value(uniqueId)->count() - 1 == engineHandler->getEngineCount()) {
-        //qDebug() << "[CORE]\t" << "Started calculating result";
         emit startCalculateResult_signal(uniqueId);
     }
 }
@@ -115,7 +124,7 @@ bool Core::readSettings(const QString &filePath) {
 }
 
 void Core::listEngineCount() {
-    //qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
+    qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
 }
 
 void Core::handleNewTask_slot(QString input) {
@@ -133,8 +142,18 @@ void Core::handleNewTask_slot(QString input) {
     }
 }
 
-void Core::calculateResult_slot(QUuid id) {
-    //qDebug() << "[CORE]\t" << "FUCKIN' PIECE OF SHIT!";
+void Core::result_slot(QUuid id) {
+    QJsonObject finalResult = calculateResult(id);
+
+    std::cout << QJsonDocument(finalResult).toJson(QJsonDocument::JsonFormat::Compact).toStdString() << std::endl;
+    std::flush(std::cout);
+
+    dbManager->addScanData(finalResult);
+
+    delete scanMap->take(id);
+}
+
+QJsonObject Core::calculateResult(QUuid id) {
     int infectedCount = 0;
     QJsonArray *resultArray = scanMap->value(id);
     QJsonObject finalResult;
@@ -162,11 +181,6 @@ void Core::calculateResult_slot(QUuid id) {
     finalResult.insert("scanDate", resultArray->at(0).toObject().value("scanDate"));
     finalResult.insert("engineResults", result);
 
-    //qDebug() << QJsonDocument(finalResult).toJson(QJsonDocument::JsonFormat::Compact);
-
-    std::cout << QJsonDocument(finalResult).toJson(QJsonDocument::JsonFormat::Compact).toStdString() << std::endl;
-    std::flush(std::cout);
-
-    dbManager->addScanData(finalResult);
+    return finalResult;
 }
 

@@ -12,4 +12,4 @@ find_package(Qt5Sql HINTS ~/Qt/5.11.1/gcc_64)
 add_executable(MiniFender main.cpp core.cpp enginehandler.cpp engine.cpp workerthread.cpp dbmanager.cpp clihandler.cpp)
 
 # linking
-target_link_libraries(MiniFender Qt5::Core Qt5::Sql)
+target_link_libraries(MiniFender Qt5::Core Qt5::Sql -lpthread)
