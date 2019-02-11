@@ -18,8 +18,8 @@ Core::~Core() {
     cliHandler->quit();
     cliHandler->wait();
 
-    delete cliHandler;
-    delete engineHandler;
+    server.stop();
+
     delete dbManager;
     delete scanMap;
 }
@@ -28,7 +28,7 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     connect(this, &Core::startCalculateResult_signal, this, &Core::result_slot, Qt::QueuedConnection);
     connect(this, &Core::finished, this, &Core::deleteLater);
 
-    emit startWebServer_signal();
+//    emit startWebServer_signal();
 
     //qDebug() << "[CORE]\t" << "Connecting to database";
     dbManager = new DBManager(dbFilePath);
@@ -38,7 +38,7 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
         return false;
     }
 
-    scanMap = new QMap<QUuid, QJsonArray*>();
+    scanMap = new QMap<QUuid, QJsonObject>();
 
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
@@ -51,6 +51,7 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     cliHandler = new CliHandler();
     connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot);
     connect(cliHandler, &CliHandler::finished, cliHandler, &CliHandler::deleteLater);
+    cliHandler->start();
 
     //qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
     if (!readSettings(settingsFilePath)) {
@@ -62,25 +63,36 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     listEngineCount();
 
     server.Get("/history", [&](const httplib::Request& req, httplib::Response& res) {
-        res.set_content(QJsonDocument(dbManager->getLastXScan(100)).toJson(QJsonDocument::JsonFormat::Compact).toStdString(), "text/plain");
+        // todo get it from query parameter
+        res.set_content(QJsonDocument(dbManager->getLastXScan(100))
+                                .toJson(QJsonDocument::JsonFormat::Compact).toStdString(), "text/plain");
     });
 
-    server.Get("scan", [&](const httplib::Request& req, httplib::Response& res) {
+    server.Post("/scan", [&](const httplib::Request& req, httplib::Response& res) {
         auto numbers = req.matches[1];
-        res.set_content(numbers, "text/plain");
+        res.set_content("HELLO", "text/plain");
     });
 
-    server.listen("localhost", 1234);
+
+    /*server.Get("/scan/{{uuid}}", [&](const httplib::Request& req, httplib::Response& res) {
+        auto numbers = req.matches[1];
+        res.set_content("HELLO", "text/plain");
+    });*/
+
+    //server.listen("localhost", 1234);
 
     return true;
 }
 
 void Core::handleEngineResults_slot(QUuid uniqueId, QJsonObject result) {
-    if (scanMap->find(uniqueId) != scanMap->end()) {
-        scanMap->value(uniqueId)->push_back(result);
+    auto it = scanMap->find(uniqueId);
+    if (it != scanMap->end()) {
+        QJsonArray temp = it->find("engineResults").value().toArray();
+        temp.push_back(result);
+        it->insert("engineResults", temp);
     }
 
-    if (scanMap->value(uniqueId)->count() - 1 == engineHandler->getEngineCount()) {
+    if (scanMap->value(uniqueId).value("engineResults").toArray().count() == engineHandler->getEngineCount()) {
         emit startCalculateResult_signal(uniqueId);
     }
 }
@@ -128,14 +140,18 @@ void Core::listEngineCount() {
 }
 
 void Core::handleNewTask_slot(QString input) {
+    qDebug() << input;
     if (QFile::exists(input)) {
         QUuid uniqueId = QUuid::createUuid();
-        //qDebug() << "[CORE]\t" << "unique ID for input:" << input << "is:" << uniqueId;
-        auto *array = new QJsonArray();
+        qDebug() << "[CORE]\t" << "unique ID for input:" << input << "is:" << uniqueId;
+
         QJsonObject initialData;
+        auto *initialArray = new QJsonArray();
         initialData.insert("scanDate", QDateTime::currentSecsSinceEpoch());
-        array->push_back(initialData);
-        scanMap->insert(uniqueId, array);
+        initialData.insert("engineResults" , *initialArray);
+        scanMap->insert(uniqueId, initialData);
+
+
         emit startNewScanTask_signal(uniqueId, input);
     } else {
         qCritical()  << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
@@ -150,16 +166,15 @@ void Core::result_slot(QUuid id) {
 
     dbManager->addScanData(finalResult);
 
-    delete scanMap->take(id);
+    scanMap->take(id);
 }
 
 QJsonObject Core::calculateResult(QUuid id) {
     int infectedCount = 0;
-    QJsonArray *resultArray = scanMap->value(id);
-    QJsonObject finalResult;
+    QJsonObject finalResult = scanMap->value(id);
 
-    for (int i = 1; i < resultArray->count(); i++) {
-        QJsonObject temp = resultArray->at(i).toObject();
+    for (int i = 0; i < finalResult.value("engineResults").toArray().count(); i++) {
+        QJsonObject temp = finalResult.value("engineResults").toArray().at(i).toObject();
         QJsonArray scan_result = temp.value("scan_result").toArray();
         if (scan_result.at(0).toObject().value("verdict").toInt() == 1) {
             infectedCount++;
@@ -171,15 +186,6 @@ QJsonObject Core::calculateResult(QUuid id) {
     } else {
         finalResult.insert("scanResult", 0);
     }
-
-    QJsonArray result;
-
-    for (int i = 1; i < resultArray->count() - 1; i++) {
-        result.push_back(resultArray->at(i).toObject());
-    }
-
-    finalResult.insert("scanDate", resultArray->at(0).toObject().value("scanDate"));
-    finalResult.insert("engineResults", result);
 
     return finalResult;
 }

@@ -5,11 +5,6 @@
 class CliHandler : public QThread {
 Q_OBJECT
 
-public:
-    CliHandler();
-
-    void init();
-
 protected:
     void run() override;
 
@@ -22,7 +17,7 @@ public slots:
 
 signals:
     void newTask_signal(const QString &filePath);
-    
+
     void stopListening_signal();
 };
 

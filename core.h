@@ -29,7 +29,7 @@ private:
 
 	CliHandler *cliHandler;
 
-	QMap<QUuid, QJsonArray*> *scanMap;
+	QMap<QUuid, QJsonObject> *scanMap;
 
 	httplib::Server server;
 
