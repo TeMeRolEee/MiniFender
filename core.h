@@ -11,6 +11,8 @@
 class Core : public QThread {
 Q_OBJECT
 public:
+	Core(const QString &rootDirectory);
+
 	~Core();
 
     bool init(const QString &settingsFilePath, const QString &dbFilePath);

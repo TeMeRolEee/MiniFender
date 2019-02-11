@@ -18,22 +18,12 @@ int main(int argc, char *argv[]) {
 	parser.addHelpOption();
 	parser.addVersionOption();
 
-	auto core = std::make_unique<Core>();
+    QString rootDirectory = QCoreApplication::applicationDirPath();
 
-	// todo constructor-ba átadni
-	QString rootDir = QCoreApplication::applicationDirPath();
+    auto core = std::make_unique<Core>(rootDirectory);
+    core->start();
 
-	if (!QDir(rootDir + "/db/").exists()) {
-		QDir().mkdir(rootDir + "/db/");
-	}
-
-	if (!QDir(rootDir + "/settings/").exists()) {
-		QDir().mkdir(rootDir + "/settings/");
-	}
-
-	core->start();
-	if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
-		qDebug() << "SHUTTING DOWN";
+	if (!(core->init(rootDirectory + "/settings/settings.ini", rootDirectory + "/db/scanHistoryDB.sqlite"))) {
 		core->quit();
 		core->wait(1000);
 		QCoreApplication::exit(1);

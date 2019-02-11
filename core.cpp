@@ -9,6 +9,17 @@
 #include <QtCore/QFile>
 #include <QtCore/QMap>
 #include <QtCore/QDateTime>
+#include <QtCore/QDir>
+
+Core::Core(const QString &rootDirectory) {
+    if (!QDir(rootDirectory + "/db/").exists()) {
+        QDir().mkdir(rootDirectory + "/db/");
+    }
+
+    if (!QDir(rootDirectory + "/settings/").exists()) {
+        QDir().mkdir(rootDirectory + "/settings/");
+    }
+}
 
 Core::~Core() {
     emit removeEngines_signal();
@@ -27,14 +38,9 @@ Core::~Core() {
 bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     connect(this, &Core::startCalculateResult_signal, this, &Core::result_slot, Qt::QueuedConnection);
     connect(this, &Core::finished, this, &Core::deleteLater);
-
-//    emit startWebServer_signal();
-
-    //qDebug() << "[CORE]\t" << "Connecting to database";
     dbManager = new DBManager(dbFilePath);
 
     if (!dbManager->init()) {
-        //qDebug() << "[CORE]\t" << "Exiting...";
         return false;
     }
 
@@ -47,21 +53,18 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     connect(engineHandler, &EngineHandler::finished, engineHandler, &EngineHandler::deleteLater);
     engineHandler->start();
 
-    //qDebug() << "[CORE]\t" << "Starting CLI handler";
     cliHandler = new CliHandler();
     connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot);
     connect(cliHandler, &CliHandler::finished, cliHandler, &CliHandler::deleteLater);
     cliHandler->start();
 
-    //qDebug() << "[CORE]\t" << "Loading settings\t" << "File location:\t" << settingsFilePath;
     if (!readSettings(settingsFilePath)) {
          qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
          return false;
      }
-    //qDebug() << "[CORE]\t" << "Settings loaded";
 
     listEngineCount();
-
+/*
     server.Get("/history", [&](const httplib::Request& req, httplib::Response& res) {
         // todo get it from query parameter
         res.set_content(QJsonDocument(dbManager->getLastXScan(100))
@@ -74,12 +77,12 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     });
 
 
-    /*server.Get("/scan/{{uuid}}", [&](const httplib::Request& req, httplib::Response& res) {
+    server.Get("/scan/{{uuid}}", [&](const httplib::Request& req, httplib::Response& res) {
         auto numbers = req.matches[1];
         res.set_content("HELLO", "text/plain");
-    });*/
+    });
 
-    //server.listen("localhost", 1234);
+    server.listen("localhost", 1234);*/
 
     return true;
 }
@@ -107,7 +110,6 @@ bool Core::readSettings(const QString &filePath) {
     QStringList keys = settings.childGroups();
 
     for (const auto &groupName : keys) {
-        //qDebug() << "[CORE]\t" << groupName;
         settings.beginGroup(groupName);
         QMap<QString, QString> engineData;
 
@@ -115,7 +117,6 @@ bool Core::readSettings(const QString &filePath) {
             for (const auto &key : settings.childKeys()) {
                 engineData.insert(key, settings.value(key).toString());
             }
-            //qInfo() << "[CORE]\t" << "Adding engine:" << groupName;
             emit addNewEngine_signal(engineData.value("path"), engineData.value("scan_parameter"), groupName);
         } else {
             badEngines.append(groupName);
@@ -140,17 +141,14 @@ void Core::listEngineCount() {
 }
 
 void Core::handleNewTask_slot(QString input) {
-    qDebug() << input;
     if (QFile::exists(input)) {
         QUuid uniqueId = QUuid::createUuid();
-        qDebug() << "[CORE]\t" << "unique ID for input:" << input << "is:" << uniqueId;
 
         QJsonObject initialData;
         auto *initialArray = new QJsonArray();
         initialData.insert("scanDate", QDateTime::currentSecsSinceEpoch());
         initialData.insert("engineResults" , *initialArray);
         scanMap->insert(uniqueId, initialData);
-
 
         emit startNewScanTask_signal(uniqueId, input);
     } else {

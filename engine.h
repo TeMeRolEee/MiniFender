@@ -10,6 +10,7 @@
 
 class Engine : public QThread {
 Q_OBJECT
+
 public:
     Engine(int id, const QString &enginePath, const QString &scanParameter);
 
