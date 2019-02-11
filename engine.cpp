@@ -1,4 +1,4 @@
-#include <utility>
+
 
 #include <QtCore/QJsonDocument>
 
@@ -6,7 +6,7 @@
 
 Engine::Engine(int id, const QString &enginePath, const QString &scanParameter)
         : id(id), enginePath(enginePath), scanParameter(scanParameter) {
-    engineProcesses = new QMap<QUuid, WorkerThread*>();
+    engineProcesses = new QMap<QUuid, WorkerThread *>();
     connect(this, &Engine::deleteEngine_signal, this, &Engine::deleteEngine_slot);
 }
 

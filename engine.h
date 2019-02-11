@@ -31,6 +31,7 @@ private:
     QMap<QUuid, WorkerThread *> *engineProcesses;
 
 public slots:
+
     void handleProcessDone_slot(QUuid uniqueId, QJsonObject result);
 
     void addNewWorker_slot(QUuid uniqueId, const QString &parameter);
@@ -38,6 +39,7 @@ public slots:
     void deleteEngine_slot();
 
 signals:
+
     void processDone_signal(QUuid uniqueId, QJsonObject result);
 
     void startEngine_signal();

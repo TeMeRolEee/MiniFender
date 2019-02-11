@@ -23,13 +23,12 @@ Core::Core(const QString &rootDirectory) {
 
 Core::~Core() {
     emit removeEngines_signal();
+    emit cliHandler->stopCli_signal();
 
     engineHandler->quit();
     engineHandler->wait();
     cliHandler->quit();
     cliHandler->wait();
-
-    server.stop();
 
     delete dbManager;
     delete scanMap;
@@ -48,41 +47,26 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
 
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
-    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot, Qt::QueuedConnection);
-    connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleEngineResults_slot, Qt::QueuedConnection);
+    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot,
+            Qt::QueuedConnection);
+    connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleEngineResults_slot,
+            Qt::QueuedConnection);
     connect(engineHandler, &EngineHandler::finished, engineHandler, &EngineHandler::deleteLater);
     engineHandler->start();
 
     cliHandler = new CliHandler();
     connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot);
     connect(cliHandler, &CliHandler::finished, cliHandler, &CliHandler::deleteLater);
-    cliHandler->start();
+    connect(cliHandler, &CliHandler::stopCli_signal, cliHandler, &CliHandler::stopCli_slot);
 
     if (!readSettings(settingsFilePath)) {
-         qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
-         return false;
-     }
+        qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
+        return false;
+    }
+
+    cliHandler->start();
 
     listEngineCount();
-/*
-    server.Get("/history", [&](const httplib::Request& req, httplib::Response& res) {
-        // todo get it from query parameter
-        res.set_content(QJsonDocument(dbManager->getLastXScan(100))
-                                .toJson(QJsonDocument::JsonFormat::Compact).toStdString(), "text/plain");
-    });
-
-    server.Post("/scan", [&](const httplib::Request& req, httplib::Response& res) {
-        auto numbers = req.matches[1];
-        res.set_content("HELLO", "text/plain");
-    });
-
-
-    server.Get("/scan/{{uuid}}", [&](const httplib::Request& req, httplib::Response& res) {
-        auto numbers = req.matches[1];
-        res.set_content("HELLO", "text/plain");
-    });
-
-    server.listen("localhost", 1234);*/
 
     return true;
 }
@@ -147,12 +131,12 @@ void Core::handleNewTask_slot(QString input) {
         QJsonObject initialData;
         auto *initialArray = new QJsonArray();
         initialData.insert("scanDate", QDateTime::currentSecsSinceEpoch());
-        initialData.insert("engineResults" , *initialArray);
+        initialData.insert("engineResults", *initialArray);
         scanMap->insert(uniqueId, initialData);
 
         emit startNewScanTask_signal(uniqueId, input);
     } else {
-        qCritical()  << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
+        qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
     }
 }
 
