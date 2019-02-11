@@ -23,6 +23,7 @@ Core::Core(const QString &rootDirectory) {
 
 Core::~Core() {
     emit removeEngines_signal();
+    emit cliHandler->stopCli_signal();
 
     engineHandler->quit();
     engineHandler->wait();
@@ -58,12 +59,14 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     cliHandler = new CliHandler();
     connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot);
     connect(cliHandler, &CliHandler::finished, cliHandler, &CliHandler::deleteLater);
-    cliHandler->start();
+    connect(cliHandler, &CliHandler::stopCli_signal, cliHandler, &CliHandler::stopCli_slot);
 
     if (!readSettings(settingsFilePath)) {
         qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
         return false;
     }
+
+    cliHandler->start();
 
     listEngineCount();
 /*
