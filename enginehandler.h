@@ -7,7 +7,7 @@
 #include "engine.h"
 
 class EngineHandler : public QThread {
-	Q_OBJECT
+Q_OBJECT
 
 public:
 	EngineHandler();
@@ -30,8 +30,6 @@ private:
 
 public slots:
 	void handleEngineResult_slot(QUuid uniqueId, QJsonObject result);
-
-    void deleteEngineHandler_slot();
 
     void addNewEngine_slot(const QString &enginePath, const QString &scanParameter, const QString &engineName);
 

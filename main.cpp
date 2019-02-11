@@ -8,34 +8,24 @@
 #include <QtCore/QDir>
 #include "core.h"
 
-#include "workerthread.h"
-
 int main(int argc, char *argv[]) {
 	QCoreApplication app(argc, argv);
 	QCoreApplication::setApplicationName("MiniFender");
-	QCoreApplication::setApplicationVersion("0.5");
+	QCoreApplication::setApplicationVersion("0.8");
 
 	QCommandLineParser parser;
 	parser.setApplicationDescription("Handles multiple scan engines");
 	parser.addHelpOption();
 	parser.addVersionOption();
 
-	auto core = std::make_unique<Core>();
+    QString rootDirectory = QCoreApplication::applicationDirPath();
 
-	QString rootDir = QCoreApplication::applicationDirPath();
+    auto core = std::make_unique<Core>(rootDirectory);
+    core->start();
 
-	if (!QDir(rootDir + "/db/").exists()) {
-		QDir().mkdir(rootDir + "/db/");
-	}
-
-	if (!QDir(rootDir + "/settings/").exists()) {
-		QDir().mkdir(rootDir + "/settings/");
-	}
-	core->start();
-	if (!(core->init(rootDir + "/settings/settings.ini", rootDir + "/db/scanHistoryDB.sqlite"))) {
-		qDebug() << "SHUTTING DOWN";
+	if (!(core->init(rootDirectory + "/settings/settings.ini", rootDirectory + "/db/scanHistoryDB.sqlite"))) {
 		core->quit();
-		core->wait();
+		core->wait(1000);
 		QCoreApplication::exit(1);
 		QCoreApplication::quit();
 		return 1;

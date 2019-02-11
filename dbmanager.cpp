@@ -15,16 +15,11 @@ bool DBManager::init() {
     if (database.open()) {
         QSqlQuery createScanHistoryTable(
                 "CREATE TABLE IF NOT EXISTS \"scanHistory\" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `scanResult` INTEGER NOT NULL DEFAULT 0, `engineResults` TEXT NOT NULL, `scanDate` INTEGER NOT NULL )");
-        /*
-         *  NOT USING AT THE MOMENT
-         *  QSqlQuery createEngineTable(
-         *      "CREATE TABLE IF NOT EXISTS `engines` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `name` TEXT NOT NULL UNIQUE )");
-        */
+
         bool initOkay = createScanHistoryTable.exec();
         database.close();
         return (initOkay);
     }
-    //qDebug() << "[DBMANAGER]\t" << "Couldn't connect to database";
     return false;
 }
 
@@ -38,14 +33,14 @@ QJsonArray DBManager::getLastXScan(int lastX) {
         if (query.exec()) {
             while (query.next()) {
                 QJsonObject data;
-                QMapIterator<QString, QVariant> mapIterator(query.boundValues());
-                while (mapIterator.hasNext()) {
-                    mapIterator.next();
-                    data.insert(mapIterator.key(), (const QJsonValue &) mapIterator.value());
-                }
-                resultArray.insert(resultArray.count(), data);
+                int scanResult = query.value(0).toInt();
+                QJsonObject engineResults = query.value(1).toJsonObject();
+                int scanDate = query.value(2).toInt();
+                data.insert("scanResult", scanResult);
+                data.insert("engineResults", engineResults);
+                data.insert("scanDate", scanDate);
+                resultArray.push_back(data);
             }
-            //qDebug() << "[DBMANAGER]" << resultArray;
             return resultArray;
         }
         database.close();
