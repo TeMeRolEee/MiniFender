@@ -6,7 +6,6 @@
 #include "enginehandler.h"
 #include "dbmanager.h"
 #include "clihandler.h"
-#include <httplib.h>
 
 class Core : public QThread {
 Q_OBJECT
@@ -32,8 +31,6 @@ private:
     CliHandler *cliHandler;
 
     QMap<QUuid, QJsonObject> *scanMap;
-
-    httplib::Server server;
 
     QJsonObject calculateResult(QUuid id);
 

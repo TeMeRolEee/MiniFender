@@ -30,8 +30,6 @@ Core::~Core() {
     cliHandler->quit();
     cliHandler->wait();
 
-    server.stop();
-
     delete dbManager;
     delete scanMap;
 }
@@ -69,25 +67,6 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     cliHandler->start();
 
     listEngineCount();
-/*
-    server.Get("/history", [&](const httplib::Request& req, httplib::Response& res) {
-        // todo get it from query parameter
-        res.set_content(QJsonDocument(dbManager->getLastXScan(100))
-                                .toJson(QJsonDocument::JsonFormat::Compact).toStdString(), "text/plain");
-    });
-
-    server.Post("/scan", [&](const httplib::Request& req, httplib::Response& res) {
-        auto numbers = req.matches[1];
-        res.set_content("HELLO", "text/plain");
-    });
-
-
-    server.Get("/scan/{{uuid}}", [&](const httplib::Request& req, httplib::Response& res) {
-        auto numbers = req.matches[1];
-        res.set_content("HELLO", "text/plain");
-    });
-
-    server.listen("localhost", 1234);*/
 
     return true;
 }
