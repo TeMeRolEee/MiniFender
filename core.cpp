@@ -48,8 +48,10 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
 
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
-    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot, Qt::QueuedConnection);
-    connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleEngineResults_slot, Qt::QueuedConnection);
+    connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot,
+            Qt::QueuedConnection);
+    connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleEngineResults_slot,
+            Qt::QueuedConnection);
     connect(engineHandler, &EngineHandler::finished, engineHandler, &EngineHandler::deleteLater);
     engineHandler->start();
 
@@ -59,9 +61,9 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     cliHandler->start();
 
     if (!readSettings(settingsFilePath)) {
-         qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
-         return false;
-     }
+        qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
+        return false;
+    }
 
     listEngineCount();
 /*
@@ -147,12 +149,12 @@ void Core::handleNewTask_slot(QString input) {
         QJsonObject initialData;
         auto *initialArray = new QJsonArray();
         initialData.insert("scanDate", QDateTime::currentSecsSinceEpoch());
-        initialData.insert("engineResults" , *initialArray);
+        initialData.insert("engineResults", *initialArray);
         scanMap->insert(uniqueId, initialData);
 
         emit startNewScanTask_signal(uniqueId, input);
     } else {
-        qCritical()  << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
+        qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
     }
 }
 

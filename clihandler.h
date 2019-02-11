@@ -11,6 +11,7 @@ protected:
 public slots:
 
 signals:
+
     void newTask_signal(const QString &filePath);
 };
 

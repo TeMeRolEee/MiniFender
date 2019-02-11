@@ -53,7 +53,8 @@ bool DBManager::addScanData(const QJsonObject &data) {
         QSqlQuery dbQuery;
         QJsonObject engines;
         engines.insert("engineResults", data.value("engineResults"));
-        dbQuery.prepare("INSERT INTO scanHistory (scanResult, engineResults, scanDate) VALUES ((:scanResult), (:engineResults), (:scanDate))");
+        dbQuery.prepare(
+                "INSERT INTO scanHistory (scanResult, engineResults, scanDate) VALUES ((:scanResult), (:engineResults), (:scanDate))");
         dbQuery.bindValue(":scanResult", data.value("scanResult").toInt());
         dbQuery.bindValue(":engineResults", QJsonDocument(engines).toJson(QJsonDocument::JsonFormat::Compact));
         dbQuery.bindValue(":scanDate", data.value("scanDate").toInt());

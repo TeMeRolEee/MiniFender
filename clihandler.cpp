@@ -5,7 +5,7 @@
 
 void CliHandler::run() {
     std::string input;
-    while(true) {
+    while (true) {
         qDebug() << "Waiting for input...";
         std::getline(std::cin, input);
         emit newTask_signal(QString::fromStdString(input));

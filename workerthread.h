@@ -21,11 +21,13 @@ private:
     QUuid id;
 
 public slots:
+
     void processDone_slot();
 
     void startWorker_slot();
 
 signals:
+
     void processDone_signal(QUuid id, QJsonObject resultArray);
 
     void startWorker_signal();
