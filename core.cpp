@@ -71,7 +71,7 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     return true;
 }
 
-void Core::handleEngineResults_slot(QUuid uniqueId, QJsonObject result) {
+void Core::handleEngineResults_slot(QUuid uniqueId, const QJsonObject& result) {
     auto it = scanMap->find(uniqueId);
     if (it != scanMap->end()) {
         QJsonArray temp = it->find("engineResults").value().toArray();
@@ -124,13 +124,13 @@ void Core::listEngineCount() {
     qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
 }
 
-void Core::handleNewTask_slot(QString input) {
+void Core::handleNewTask_slot(const QString& input) {
     if (QFile::exists(input)) {
         QUuid uniqueId = QUuid::createUuid();
 
         QJsonObject initialData;
         auto *initialArray = new QJsonArray();
-        initialData.insert("scanDate", QDateTime::currentSecsSinceEpoch());
+        initialData.insert("scanDate", QDateTime::currentMSecsSinceEpoch());
         initialData.insert("engineResults", *initialArray);
         scanMap->insert(uniqueId, initialData);
 
@@ -153,7 +153,8 @@ void Core::result_slot(QUuid id) {
 
 QJsonObject Core::calculateResult(QUuid id) {
     int infectedCount = 0;
-    QJsonObject finalResult = scanMap->value(id);
+    QJsonObject finalResult_prot = scanMap->value(id);
+    QJsonObject finalResult;
 
     for (int i = 0; i < finalResult.value("engineResults").toArray().count(); i++) {
         QJsonObject temp = finalResult.value("engineResults").toArray().at(i).toObject();
@@ -168,6 +169,12 @@ QJsonObject Core::calculateResult(QUuid id) {
     } else {
         finalResult.insert("scanResult", 0);
     }
+
+    int64_t scanDateTime = scanMap->value(id).value("scanDate").toDouble();
+    int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
+    int scanTime = ( currentTime - scanDateTime);
+
+    finalResult.insert("scanTime", scanTime);
 
     return finalResult;
 }

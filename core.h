@@ -36,9 +36,9 @@ private:
 
 private slots:
 
-    void handleEngineResults_slot(QUuid uniqueId, QJsonObject result);
+    void handleEngineResults_slot(QUuid uniqueId, const QJsonObject& result);
 
-    void handleNewTask_slot(QString input);
+    void handleNewTask_slot(const QString& input);
 
     void result_slot(QUuid id);
 
