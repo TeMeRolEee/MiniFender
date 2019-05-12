@@ -32,7 +32,7 @@ void Engine::addNewWorker_slot(QUuid uniqueId, const QString &parameter) {
         engineProcesses->insert(uniqueId, workerThread);
         workerThread->start();
 
-        connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot);
+        connect(workerThread, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot, Qt::QueuedConnection);
         connect(this, &Engine::startEngine_signal, workerThread, &WorkerThread::startWorker_slot, Qt::QueuedConnection);
         connect(workerThread, &WorkerThread::finished, workerThread, &WorkerThread::deleteLater);
 

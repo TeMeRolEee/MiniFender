@@ -11,7 +11,7 @@ WorkerThread::WorkerThread(QUuid id, const QString &enginePath, const QStringLis
         enginePath(enginePath) {
     process = new QProcess();
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
-            &WorkerThread::processDone_slot);
+            &WorkerThread::processDone_slot, Qt::QueuedConnection);
     connect(this, &WorkerThread::startWorker_signal, this, &WorkerThread::startWorker_slot, Qt::QueuedConnection);
 }
 
