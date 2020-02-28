@@ -172,7 +172,7 @@ QJsonObject Core::calculateResult(QUuid id) {
 
 	int64_t scanDateTime = scanMap->value(id).value("scanDate").toDouble();
 	int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
-	int scanTime = (currentTime - scanDateTime);
+	long long scanTime = (currentTime - scanDateTime);
 
 	finalResult.insert("scanTime", scanTime);
 
