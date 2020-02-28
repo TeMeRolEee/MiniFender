@@ -10,48 +10,48 @@
 class Core : public QThread {
 Q_OBJECT
 public:
-    Core(const QString &rootDirectory);
+	Core(const QString &rootDirectory);
 
-    ~Core();
+	~Core();
 
-    bool init(const QString &settingsFilePath, const QString &dbFilePath);
+	bool init(const QString &settingsFilePath, const QString &dbFilePath);
 
-    void listEngineCount();
+	void listEngineCount();
 
 protected:
-    void run() override;
+	void run() override;
 
 private:
-    bool readSettings(const QString &filePath);
+	bool readSettings(const QString &filePath);
 
-    EngineHandler *engineHandler;
+	EngineHandler *engineHandler;
 
-    DBManager *dbManager;
+	DBManager *dbManager;
 
-    CliHandler *cliHandler;
+	CliHandler *cliHandler;
 
-    QMap<QUuid, QJsonObject> *scanMap;
+	QMap<QUuid, QJsonObject> *scanMap;
 
-    QJsonObject calculateResult(QUuid id);
+	QJsonObject calculateResult(QUuid id);
 
 private slots:
 
-    void handleEngineResults_slot(QUuid uniqueId, const QJsonObject& result);
+	void handleEngineResults_slot(QUuid uniqueId, const QJsonObject &result);
 
-    void handleNewTask_slot(const QString& input);
+	void handleNewTask_slot(const QString &input);
 
-    void result_slot(QUuid id);
+	void result_slot(QUuid id);
 
 signals:
 
-    void addNewEngine_signal(const QString &enginePath, const QString &scanParameter, const QString &engineName);
+	void addNewEngine_signal(const QString &enginePath, const QString &scanParameter, const QString &engineName);
 
-    void startNewScanTask_signal(QUuid uniqueId, QString file);
+	void startNewScanTask_signal(QUuid uniqueId, QString file);
 
-    void removeEngines_signal();
+	void removeEngines_signal();
 
-    void startCalculateResult_signal(QUuid id);
+	void startCalculateResult_signal(QUuid id);
 
-    void startWebServer_signal();
+	void startWebServer_signal();
 };
 

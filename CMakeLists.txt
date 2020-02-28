@@ -3,8 +3,8 @@ project(MiniFender)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC )
-set(CMAKE_AUTORCC )
+set(CMAKE_AUTOUIC)
+set(CMAKE_AUTORCC)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 configure_file(settings.ini settings/settings.ini COPYONLY)
