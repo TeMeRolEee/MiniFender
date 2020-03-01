@@ -146,7 +146,7 @@ void Core::result_slot(QUuid id) {
 	std::cout << QJsonDocument(finalResult).toJson(QJsonDocument::JsonFormat::Compact).toStdString() << std::endl;
 	std::flush(std::cout);
 
-	dbManager->addScanData(finalResult);
+	dbManager->addScanData_slot(finalResult);
 
 	scanMap->take(id);
 }

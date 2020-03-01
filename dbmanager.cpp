@@ -5,24 +5,11 @@
 #include <QJsonDocument>
 
 DBManager::DBManager(const QString &path) : dataBaseFilePath(path) {
-	connect(this, &DBManager::init_signal, this, &DBManager::init_slot);
+	connect(this, &DBManager::init_signal, this, &DBManager::init_slot, Qt::QueuedConnection);
 }
 
 bool DBManager::init() {
-	database = new QSqlDatabase();
-	QSqlDatabase::addDatabase("QSQLITE");
-	//database = QSqlDatabase::addDatabase("QSQLITE");
-	database->setDatabaseName(dataBaseFilePath);
-
-	if (database->open()) {
-		QSqlQuery createScanHistoryTable(
-				"CREATE TABLE IF NOT EXISTS \"scanHistory\" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `scanResult` INTEGER NOT NULL DEFAULT 0, `engineResults` TEXT NOT NULL, `scanDate` INTEGER NOT NULL )");
-
-		bool initOkay = createScanHistoryTable.exec();
-		database->close();
-		return (initOkay);
-	}
-	return false;
+	emit init_signal();
 }
 
 QJsonArray DBManager::getLastXScan(int lastX) {
@@ -50,7 +37,7 @@ QJsonArray DBManager::getLastXScan(int lastX) {
 	return QJsonArray();
 }
 
-bool DBManager::addScanData(const QJsonObject &data) {
+void DBManager::addScanData_slot(const QJsonObject &data) {
 	if (!data.isEmpty() && database->open()) {
 		QSqlQuery dbQuery;
 		QJsonObject engines;
@@ -67,9 +54,9 @@ bool DBManager::addScanData(const QJsonObject &data) {
 			qDebug() << queryResult << dbQuery.lastError();
 		}
 		database->close();
-		return queryResult;
+		emit addScanDataResult_signal(queryResult);
 	}
-	return false;
+	emit addScanDataResult_signal(false);
 }
 
 DBManager::~DBManager() {
@@ -77,7 +64,22 @@ DBManager::~DBManager() {
 }
 
 void DBManager::init_slot() {
-	emit initDone_signal(init());
+	database = new QSqlDatabase();
+	QSqlDatabase::addDatabase("QSQLITE");
+	database->setDatabaseName(dataBaseFilePath);
+
+	if (database->open()) {
+		QSqlQuery createScanHistoryTable(
+				"CREATE TABLE IF NOT EXISTS \"scanHistory\" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `scanResult` INTEGER NOT NULL DEFAULT 0, `engineResults` TEXT NOT NULL, `scanDate` INTEGER NOT NULL )");
+
+		bool initOkay = createScanHistoryTable.exec();
+		database->close();
+		if (!initOkay) {
+			delete database;
+		}
+		emit initDone_signal(initOkay);
+	}
+	emit initDone_signal(false);
 }
 
 
