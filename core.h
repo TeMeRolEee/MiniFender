@@ -6,6 +6,7 @@
 #include "enginehandler.h"
 #include "dbmanager.h"
 #include "clihandler.h"
+#include "authclient.h"
 
 class Core : public QThread {
 Q_OBJECT
@@ -24,21 +25,25 @@ protected:
 private:
     bool readSettings(const QString &filePath);
 
-    EngineHandler *engineHandler;
+    EngineHandler *engineHandler = nullptr;
 
-    DBManager *dbManager;
+    DBManager *dbManager = nullptr;
 
-    CliHandler *cliHandler;
+    CliHandler *cliHandler = nullptr;
 
-    QMap<QUuid, QJsonObject> *scanMap;
+    QMap<QUuid, QJsonObject> *scanMap = nullptr;
 
     QJsonObject calculateResult(QUuid id);
+
+    AuthClient *authClient = nullptr;
 
 private slots:
 
     void handleEngineResults_slot(QUuid uniqueId, const QJsonObject& result);
 
     void handleNewTask_slot(const QString& input);
+
+	void handleAuthenticationResponse_slot(bool isGood);
 
     void result_slot(QUuid id);
 
@@ -53,5 +58,7 @@ signals:
     void startCalculateResult_signal(QUuid id);
 
     void startWebServer_signal();
+
+	void sendSerialKey_signal(const QString &serial);
 };
 

@@ -10,6 +10,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
+#include <QtCore/QCoreApplication>
 
 Core::Core(const QString &rootDirectory) {
     if (!QDir(rootDirectory + "/db/").exists()) {
@@ -29,7 +30,10 @@ Core::~Core() {
     engineHandler->wait();
     cliHandler->quit();
     cliHandler->wait();
+    authClient->quit();
+    authClient->wait();
 
+    delete authClient;
     delete dbManager;
     delete scanMap;
 }
@@ -42,6 +46,16 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
     if (!dbManager->init()) {
         return false;
     }
+
+    authClient = new AuthClient();
+    authClient->start();
+	connect(authClient, &AuthClient::finished, authClient, &AuthClient::deleteLater);
+	connect(authClient, &AuthClient::recievedResponse, this, &Core::handleAuthenticationResponse_slot);
+	connect(this, &Core::sendSerialKey_signal, authClient, &AuthClient::sendSerialKey_slot);
+	if (!authClient->init("auth")) {
+		return false;
+	}
+	emit sendSerialKey_signal("828274c407f427efdabcb22c8daa72672a6b802096347629e29209bfb037042ba53015a108eb47d19316c3af010d92cf4cbc26214deee805a423db20fa6308ed");
 
     scanMap = new QMap<QUuid, QJsonObject>();
 
@@ -177,5 +191,16 @@ QJsonObject Core::calculateResult(QUuid id) {
     finalResult.insert("scanTime", scanTime);
 
     return finalResult;
+}
+
+void Core::handleAuthenticationResponse_slot(bool isGood) {
+	if (!isGood) {
+		qCritical() << "Critical error: not a valid serial key." << endl << "Shutting down";
+		this->quit();
+		this->wait();
+		QCoreApplication::exit(0);
+	} else {
+		qInfo() << "Info: serial key verified and accepted";
+	}
 }
 
