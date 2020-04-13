@@ -1,7 +1,9 @@
+#include <QtCore/QTimer>
 #include "authclient.h"
 
 AuthClient::AuthClient() {
-	localSocket = new QLocalSocket();
+	localSocket = new QTcpSocket();
+	connect(localSocket, &QTcpSocket::disconnected, localSocket, &QTcpSocket::deleteLater);
 }
 
 AuthClient::~AuthClient() {
@@ -18,19 +20,29 @@ bool AuthClient::init(const QString &address) {
 }
 
 void AuthClient::sendSerialKey_slot(const QString &serial) {
-	localSocket->connectToServer(ipAddress);
-	qDebug() << "Connection to server:" << localSocket->isOpen();
+	localSocket->connectToHost(ipAddress, 50137);
+	qDebug() << "Connection to server:" << localSocket->isOpen() << endl << "Serial is:" << serial;
+
 	QByteArray block;
 	QDataStream out(&block, QIODevice::ReadWrite);
-	//out.setVersion(QDataStream::Qt_5_12);
-	out << serial;
+	out.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+
+	out << QByteArray(serial.toLocal8Bit()).toBase64();
+
+	localSocket->waitForConnected();
 	localSocket->write(block);
-	connect(localSocket, &QLocalSocket::disconnected, localSocket, &QLocalSocket::deleteLater);
+	localSocket->waitForBytesWritten();
 	localSocket->flush();
-	localSocket->waitForBytesWritten(3000);
+	localSocket->waitForReadyRead();
 
-	QString response = localSocket->readAll();
-	qDebug() << response;
+	QByteArray block2;
+	QDataStream out2(&block2, QIODevice::ReadWrite);
 
-	emit recievedResponse(response == ("OK"));
+	out2 << localSocket->readAll();
+
+	QString response = QString(QByteArray::fromBase64(block2));
+
+	localSocket->close();
+
+	emit recievedResponse(response == ("ACCEPTED"));
 }

@@ -2,7 +2,7 @@
 
 #include <QtCore/QThread>
 #include <QtCore/QDataStream>
-#include <QtNetwork/QLocalSocket>
+#include <QtNetwork/QTcpSocket>
 
 class AuthClient : public QThread {
 Q_OBJECT
@@ -14,7 +14,7 @@ public:
 	bool init(const QString &address);
 
 private:
-	QLocalSocket *localSocket = nullptr;
+	QTcpSocket *localSocket = nullptr;
 	QString ipAddress;
 
 public slots:

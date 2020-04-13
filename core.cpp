@@ -52,7 +52,7 @@ bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
 	connect(authClient, &AuthClient::finished, authClient, &AuthClient::deleteLater);
 	connect(authClient, &AuthClient::recievedResponse, this, &Core::handleAuthenticationResponse_slot);
 	connect(this, &Core::sendSerialKey_signal, authClient, &AuthClient::sendSerialKey_slot);
-	if (!authClient->init("auth")) {
+	if (!authClient->init("127.0.0.1")) {
 		return false;
 	}
 	emit sendSerialKey_signal("828274c407f427efdabcb22c8daa72672a6b802096347629e29209bfb037042ba53015a108eb47d19316c3af010d92cf4cbc26214deee805a423db20fa6308ed");
@@ -186,7 +186,7 @@ QJsonObject Core::calculateResult(QUuid id) {
 
     int64_t scanDateTime = scanMap->value(id).value("scanDate").toDouble();
     int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
-    int scanTime = ( currentTime - scanDateTime);
+    int scanTime = ( currentTime - scanDateTime );
 
     finalResult.insert("scanTime", scanTime);
 
@@ -198,7 +198,7 @@ void Core::handleAuthenticationResponse_slot(bool isGood) {
 		qCritical() << "Critical error: not a valid serial key." << endl << "Shutting down";
 		this->quit();
 		this->wait();
-		QCoreApplication::exit(0);
+		QCoreApplication::quit();
 	} else {
 		qInfo() << "Info: serial key verified and accepted";
 	}
