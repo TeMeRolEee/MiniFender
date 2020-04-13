@@ -13,6 +13,9 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Sql REQUIRED)
 
+add_subdirectory(TestEngines)
+include_directories(TestEngines)
+
 add_executable(MiniFender main.cpp core.cpp enginehandler.cpp engine.cpp workerthread.cpp dbmanager.cpp clihandler.cpp authclient.cpp authclient.h)
 
 # linking

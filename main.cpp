@@ -20,11 +20,7 @@ int main(int argc, char *argv[]) {
     auto core = std::make_unique<Core>(rootDirectory);
     core->start();
 
-    if (!(core->init(rootDirectory + "/settings/settings.ini", rootDirectory + "/db/scanHistoryDB.sqlite"))) {
-        core->quit();
-        core->wait();
-        QCoreApplication::exit(1);
-    }
+    core->init(rootDirectory + "/settings/settings.ini", rootDirectory + "/db/scanHistoryDB.sqlite");
 
     return QCoreApplication::exec();
 }

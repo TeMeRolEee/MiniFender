@@ -10,7 +10,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
-#include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
 
 Core::Core(const QString &rootDirectory) {
     if (!QDir(rootDirectory + "/db/").exists()) {
@@ -39,25 +39,29 @@ Core::~Core() {
 }
 
 bool Core::init(const QString &settingsFilePath, const QString &dbFilePath) {
-    connect(this, &Core::startCalculateResult_signal, this, &Core::result_slot, Qt::QueuedConnection);
-    connect(this, &Core::finished, this, &Core::deleteLater);
-    dbManager = new DBManager(dbFilePath);
+	connect(this, &Core::startCalculateResult_signal, this, &Core::result_slot, Qt::QueuedConnection);
+	connect(this, &Core::finished, this, &Core::deleteLater);
+	dbManager = new DBManager(dbFilePath);
 
-    if (!dbManager->init()) {
-        return false;
-    }
+	if (!dbManager->init()) {
+		return false;
+	}
 
-    authClient = new AuthClient();
-    authClient->start();
+	authClient = new AuthClient();
+	authClient->start();
+
 	connect(authClient, &AuthClient::finished, authClient, &AuthClient::deleteLater);
 	connect(authClient, &AuthClient::recievedResponse, this, &Core::handleAuthenticationResponse_slot);
 	connect(this, &Core::sendSerialKey_signal, authClient, &AuthClient::sendSerialKey_slot);
+
 	if (!authClient->init("127.0.0.1")) {
 		return false;
 	}
+
 	emit sendSerialKey_signal("828274c407f427efdabcb22c8daa72672a6b802096347629e29209bfb037042ba53015a108eb47d19316c3af010d92cf4cbc26214deee805a423db20fa6308ed");
 
-    scanMap = new QMap<QUuid, QJsonObject>();
+
+	scanMap = new QMap<QUuid, QJsonObject>();
 
     engineHandler = new EngineHandler();
     connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
@@ -139,19 +143,23 @@ void Core::listEngineCount() {
 }
 
 void Core::handleNewTask_slot(const QString& input) {
-    if (QFile::exists(input)) {
-        QUuid uniqueId = QUuid::createUuid();
+	if (!isRegistered) {
+		if (QFile::exists(input)) {
+			QUuid uniqueId = QUuid::createUuid();
 
-        QJsonObject initialData;
-        auto *initialArray = new QJsonArray();
-        initialData.insert("scanDate", QDateTime::currentMSecsSinceEpoch());
-        initialData.insert("engineResults", *initialArray);
-        scanMap->insert(uniqueId, initialData);
+			QJsonObject initialData;
+			auto *initialArray = new QJsonArray();
+			initialData.insert("scanDate", QDateTime::currentMSecsSinceEpoch());
+			initialData.insert("engineResults", *initialArray);
+			scanMap->insert(uniqueId, initialData);
 
-        emit startNewScanTask_signal(uniqueId, input);
-    } else {
-        qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
-    }
+			emit startNewScanTask_signal(uniqueId, input);
+		} else {
+			qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
+		}
+	} else {
+		qCritical() << "[CORE]\t" << "ERROR:\t" << "Product not registered, unable to perform scan";
+	}
 }
 
 void Core::result_slot(QUuid id) {
@@ -195,11 +203,9 @@ QJsonObject Core::calculateResult(QUuid id) {
 
 void Core::handleAuthenticationResponse_slot(bool isGood) {
 	if (!isGood) {
-		qCritical() << "Critical error: not a valid serial key." << endl << "Shutting down";
-		this->quit();
-		this->wait();
-		QCoreApplication::quit();
+		qCritical() << "Critical error: not a valid serial key.";
 	} else {
+		isRegistered = true;
 		qInfo() << "Info: serial key verified and accepted";
 	}
 }

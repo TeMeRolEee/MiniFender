@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QCoreApplication>
 #include <QUuid>
 
 #include "enginehandler.h"
@@ -24,6 +25,8 @@ protected:
 
 private:
     bool readSettings(const QString &filePath);
+
+    bool isRegistered = false;
 
     EngineHandler *engineHandler = nullptr;
 
@@ -57,7 +60,7 @@ signals:
 
     void startCalculateResult_signal(QUuid id);
 
-    void startWebServer_signal();
+    void checkedRegistration_signal();
 
 	void sendSerialKey_signal(const QString &serial);
 };
