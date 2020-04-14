@@ -43,7 +43,7 @@ void AuthClient::sendSerialKey_slot(const QString &serial) {
 		QString response = QString(QByteArray::fromBase64(block2));
 
 		localSocket->close();
-
+		qDebug() << "[AUTH]\t" << response << (response == ("ACCEPTED"));
 		emit recievedResponse(response == ("ACCEPTED"));
 	}
 

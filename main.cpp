@@ -20,7 +20,43 @@ int main(int argc, char *argv[]) {
     auto core = std::make_unique<Core>(rootDirectory);
     core->start();
 
-    core->init(rootDirectory + "/settings/settings.ini", rootDirectory + "/db/scanHistoryDB.sqlite");
+	auto *isRegistered = new bool();
+	*isRegistered = false;
+
+	auto isChecked = new bool();
+	*isChecked = false;
+
+	if (!core->parseSerial(rootDirectory + "/settings/auth.ini", isRegistered, isChecked)) {
+		qDebug() << "[MAIN]\t" << "parseSerial: failed";
+		core->quit();
+		core->wait();
+		QCoreApplication::exit(1);
+		return 1;
+	}
+
+	for (int i = 0; i < 10; ++i) {
+		if (*isChecked) {
+			break;
+		} else {
+			std::this_thread::sleep_for(std::chrono_literals::operator""ms(250));
+		}
+	}
+
+	if (!*isRegistered) {
+		qDebug() << "[MAIN]\t" << "Not registered";
+		delete isRegistered;
+		core->quit();
+		core->wait();
+		QCoreApplication::exit(1);
+		return 1;
+	}
+
+    if (!core->init(rootDirectory + "/settings/settings.ini")) {
+    	core->quit();
+    	core->wait();
+    	QCoreApplication::exit(1);
+		return 1;
+    }
 
     return QCoreApplication::exec();
 }

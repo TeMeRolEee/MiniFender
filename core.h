@@ -16,17 +16,26 @@ public:
 
     ~Core();
 
-    bool init(const QString &settingsFilePath, const QString &dbFilePath);
+    bool init(const QString &settingsFilePath);
 
     void listEngineCount();
 
-protected:
-    void run() override;
+	bool parseSerial(const QString &filePath, bool *isRegistered, bool *checked);
 
+protected:
+
+	void run() override;
 private:
+
+	QString rootDirectory;
+
     bool readSettings(const QString &filePath);
 
-    bool isRegistered = false;
+    bool *isRegistered;
+
+    bool *isChecked;
+
+    int counter = 0;
 
     EngineHandler *engineHandler = nullptr;
 

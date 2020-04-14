@@ -8,6 +8,7 @@ set(CMAKE_AUTORCC )
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 configure_file(settings.ini settings/settings.ini COPYONLY)
+configure_file(auth.ini settings/auth.ini COPYONLY)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
@@ -16,7 +17,20 @@ find_package(Qt5Sql REQUIRED)
 add_subdirectory(TestEngines)
 include_directories(TestEngines)
 
+add_subdirectory(AuthServer)
+include_directories(AuthServer)
+
 add_executable(MiniFender main.cpp core.cpp enginehandler.cpp engine.cpp workerthread.cpp dbmanager.cpp clihandler.cpp authclient.cpp authclient.h)
+
+install(TARGETS MiniFender
+		CONFIGURATIONS Release
+		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender)
+install(TARGETS MiniFender_auth_server
+		CONFIGURATIONS Release
+		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender)
+install(TARGETS TestEngines
+		CONFIGURATIONS Release
+		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender/engines)
 
 # linking
 target_link_libraries(MiniFender Qt5::Core Qt5::Sql Qt5::Network)
