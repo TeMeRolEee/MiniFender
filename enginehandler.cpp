@@ -24,6 +24,7 @@ void EngineHandler::run() {
 }
 
 void EngineHandler::handleEngineResult_slot(QUuid uniqueId, QJsonObject result) {
+	qInfo() << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
 	emit scanComplete_signal(uniqueId, std::move(result));
 }
 

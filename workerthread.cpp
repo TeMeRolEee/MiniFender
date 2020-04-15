@@ -2,6 +2,7 @@
 #include <QtCore/QJsonObject>
 #include <QUuid>
 #include <QDebug>
+#include <iostream>
 
 #include "workerthread.h"
 
@@ -10,7 +11,9 @@ WorkerThread::WorkerThread(QUuid id, const QString &enginePath, const QStringLis
 		paramList(paramList),
 		enginePath(enginePath) {
 	process = new QProcess();
-	connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,&WorkerThread::processDone_slot, Qt::QueuedConnection);
+	//connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,&WorkerThread::processDone_slot, Qt::QueuedConnection);
+	connect(process, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,&WorkerThread::processDone_slot, Qt::QueuedConnection);
+	//connect(process, &QProcess::stateChanged, this, &WorkerThread::processDone_slot, Qt::UniqueConnection);
 	connect(this, &WorkerThread::startWorker_signal, this, &WorkerThread::startWorker_slot, Qt::QueuedConnection);
 }
 
@@ -24,13 +27,19 @@ void WorkerThread::run() {
 }
 
 void WorkerThread::processDone_slot() {
-	QString tempString = process->readAllStandardOutput();
-	QJsonObject object = QJsonDocument::fromJson(tempString.toUtf8()).object();
-	QJsonDocument qJsonDocument(object);
+	//if (process->exitCode() == 0) {
+		QString tempString = process->readAll();
+		QJsonObject object = QJsonDocument::fromJson(tempString.toUtf8()).object();
+		QJsonDocument qJsonDocument(object);
 
-	emit processDone_signal(id, object);
+		qInfo() << tempString;
+
+		emit processDone_signal(id, object);
+	//}
 }
 
 void WorkerThread::startWorker_slot() {
+	std::cout << "SHIIT";
+	qInfo() << "SHIT";
 	process->start(enginePath, paramList);
 }

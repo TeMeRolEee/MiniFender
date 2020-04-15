@@ -130,22 +130,18 @@ void Core::listEngineCount() {
 }
 
 void Core::handleNewTask_slot(const QString &input) {
-	if (!isRegistered) {
-		if (QFile::exists(input)) {
-			QUuid uniqueId = QUuid::createUuid();
+	if (QFile::exists(input)) {
+		QUuid uniqueId = QUuid::createUuid();
 
-			QJsonObject initialData;
-			auto *initialArray = new QJsonArray();
-			initialData.insert("scanDate", QDateTime::currentMSecsSinceEpoch());
-			initialData.insert("engineResults", *initialArray);
-			scanMap->insert(uniqueId, initialData);
+		QJsonObject initialData;
+		auto *initialArray = new QJsonArray();
+		initialData.insert("scanDate", QDateTime::currentMSecsSinceEpoch());
+		initialData.insert("engineResults", *initialArray);
+		scanMap->insert(uniqueId, initialData);
 
-			emit startNewScanTask_signal(uniqueId, input);
-		} else {
-			qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
-		}
+		emit startNewScanTask_signal(uniqueId, input);
 	} else {
-		qCritical() << "[CORE]\t" << "ERROR:\t" << "Product not registered, unable to perform scan";
+		qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
 	}
 }
 
@@ -161,6 +157,7 @@ void Core::result_slot(QUuid id) {
 }
 
 QJsonObject Core::calculateResult(QUuid id) {
+	qInfo() << "[CORE]\t" << "Calculating results";
 	int infectedCount = 0;
 	QJsonObject finalResult_prot = scanMap->value(id);
 	QJsonObject finalResult;
