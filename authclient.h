@@ -11,11 +11,12 @@ public:
 	explicit AuthClient();
 	~AuthClient() override;
 
-	bool init(const QString &address);
+	bool init(const QString &address, int port);
 
 private:
 	QTcpSocket *localSocket = nullptr;
 	QString ipAddress;
+	int port = 50137;
 
 public slots:
 	void sendSerialKey_slot(const QString &serial);

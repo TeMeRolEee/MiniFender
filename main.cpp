@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 	*isChecked = false;
 
 	if (!core->parseSerial(rootDirectory + "/settings/auth.ini", isRegistered, isChecked)) {
-		qDebug() << "[MAIN]\t" << "parseSerial: failed";
+		qCritical() << "[MAIN]\t" << "Cannot authenticate the product. Shutting down";
 		core->quit();
 		core->wait();
 		QCoreApplication::exit(1);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (!*isRegistered) {
-		qDebug() << "[MAIN]\t" << "Not registered";
+		qCritical() << "[MAIN]\t" << "Not registered product. Shutting down";
 		delete isRegistered;
 		core->quit();
 		core->wait();
@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
 	}
 
     if (!core->init(rootDirectory + "/settings/settings.ini")) {
+		qCritical() << "[MAIN]\t" << "Cannot parse settings. Shutting down";
     	core->quit();
     	core->wait();
     	QCoreApplication::exit(1);

@@ -14,13 +14,19 @@ AuthClient::~AuthClient() {
 	delete localSocket;
 }
 
-bool AuthClient::init(const QString &address) {
+bool AuthClient::init(const QString &address, int port) {
+	if (address.isEmpty() || (port < 1 || port > 65535)) {
+		return false;
+	}
+
 	this->ipAddress = address;
+	this->port = port;
+
 	return true;
 }
 
 void AuthClient::sendSerialKey_slot(const QString &serial) {
-	localSocket->connectToHost(ipAddress, 50137);
+	localSocket->connectToHost(ipAddress, port);
 
 	if (localSocket->waitForConnected() && localSocket->isOpen()) {
 		QByteArray block;

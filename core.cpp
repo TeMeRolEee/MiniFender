@@ -60,7 +60,7 @@ bool Core::init(const QString &settingsFilePath) {
 	connect(engineHandler, &EngineHandler::finished, engineHandler, &EngineHandler::deleteLater);
 	engineHandler->start();
 
-	connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot);
+	connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot, Qt::QueuedConnection);
 	connect(cliHandler, &CliHandler::finished, cliHandler, &CliHandler::deleteLater);
 	connect(cliHandler, &CliHandler::stopCli_signal, cliHandler, &CliHandler::stopCli_slot);
 
@@ -225,17 +225,20 @@ bool Core::parseSerial(const QString &filePath, bool *isRegistered, bool *checke
 	settings->beginGroup("Authentication");
 	QString serial = settings->value("serial").toString();
 	QString url = settings->value("url").toString();
-	qDebug() << serial << url;
+	int port = settings->value("port").toInt();
+	qDebug() << serial << url << port;
 
-	if (serial.isEmpty() || url.isEmpty()) {
+	if (serial.isEmpty() || url.isEmpty() || (port < 1 || port > 65535)) {
+		//qDebug() << "[CORE]\t" << "Wrong auth settings";
 		return false;
 	}
 
-	if (!authClient->init(url)) {
+	if (!authClient->init(url, port)) {
 		return false;
 	}
 
 	emit sendSerialKey_signal(serial);
+
 	return true;
 }
 
