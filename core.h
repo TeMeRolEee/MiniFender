@@ -12,64 +12,65 @@
 class Core : public QThread {
 Q_OBJECT
 public:
-    Core(const QString &rootDirectory);
+	Core(const QString &rootDirectory);
 
-    ~Core();
+	~Core();
 
-    bool init(const QString &settingsFilePath);
+	bool init(const QString &settingsFilePath);
 
-    void listEngineCount();
+	void listEngineCount();
 
 	bool parseSerial(const QString &filePath, bool *isRegistered, bool *checked);
 
 protected:
 
 	void run() override;
+
 private:
 
 	QString rootDirectory;
 
-    bool readSettings(const QString &filePath);
+	bool readSettings(const QString &filePath);
 
-    bool *isRegistered;
+	bool *isRegistered;
 
-    bool *isChecked;
+	bool *isChecked;
 
-    int counter = 0;
+	int counter = 0;
 
-    EngineHandler *engineHandler = nullptr;
+	EngineHandler *engineHandler = nullptr;
 
-    DBManager *dbManager = nullptr;
+	DBManager *dbManager = nullptr;
 
-    CliHandler *cliHandler = nullptr;
+	CliHandler *cliHandler = nullptr;
 
-    QMap<QUuid, QJsonObject> *scanMap = nullptr;
+	QMap<QUuid, QJsonObject> *scanMap = nullptr;
 
-    QJsonObject calculateResult(QUuid id);
+	QJsonObject calculateResult(QUuid id);
 
-    AuthClient *authClient = nullptr;
+	AuthClient *authClient = nullptr;
 
 private slots:
 
-    void handleEngineResults_slot(QUuid uniqueId, const QJsonObject& result);
+	void handleEngineResults_slot(QUuid uniqueId, const QJsonObject &result);
 
-    void handleNewTask_slot(const QString& input);
+	void handleNewTask_slot(const QString &input);
 
 	void handleAuthenticationResponse_slot(bool isGood);
 
-    void result_slot(QUuid id);
+	void result_slot(QUuid id);
 
 signals:
 
-    void addNewEngine_signal(const QString &enginePath, const QString &scanParameter, const QString &engineName);
+	void addNewEngine_signal(const QString &enginePath, const QString &scanParameter, const QString &engineName);
 
-    void startNewScanTask_signal(QUuid uniqueId, QString file);
+	void startNewScanTask_signal(QUuid uniqueId, QString file);
 
-    void removeEngines_signal();
+	void removeEngines_signal();
 
-    void startCalculateResult_signal(QUuid id);
+	void startCalculateResult_signal(QUuid id);
 
-    void checkedRegistration_signal();
+	void checkedRegistration_signal();
 
 	void sendSerialKey_signal(const QString &serial);
 };

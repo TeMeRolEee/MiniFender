@@ -12,40 +12,40 @@ class Engine : public QThread {
 Q_OBJECT
 
 public:
-    Engine(int id, const QString &enginePath, const QString &scanParameter);
+	Engine(int id, const QString &enginePath, const QString &scanParameter);
 
-    ~Engine() override;
+	~Engine() override;
 
-    const QString &getEnginePath() const;
+	const QString &getEnginePath() const;
 
 protected:
-    void run() override;
+	void run() override;
 
 private:
-    int id = 0;
+	int id = 0;
 
-    QString enginePath;
-    QString scanParameter;
+	QString enginePath;
+	QString scanParameter;
 
 private:
-    QMap<QUuid, WorkerThread *> *engineProcesses;
+	QMap<QUuid, WorkerThread *> *engineProcesses;
 
 public slots:
 
-    void handleProcessDone_slot(QUuid uniqueId, QJsonObject result);
+	void handleProcessDone_slot(QUuid uniqueId, QJsonObject result);
 
-    void addNewWorker_slot(QUuid uniqueId, const QString &parameter);
+	void addNewWorker_slot(QUuid uniqueId, const QString &parameter);
 
-    void deleteEngine_slot();
+	void deleteEngine_slot();
 
 signals:
 
-    void processDone_signal(QUuid uniqueId, QJsonObject result);
+	void processDone_signal(QUuid uniqueId, QJsonObject result);
 
-    void startEngine_signal();
+	void startEngine_signal();
 
-    void deleteEngine_signal();
+	void deleteEngine_signal();
 
-    void deletingDone_signal(int id);
+	void deletingDone_signal(int id);
 };
 

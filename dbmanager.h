@@ -7,17 +7,17 @@
 
 class DBManager {
 public:
-    DBManager(const QString &path);
+	DBManager(const QString &path);
 
-    bool init();
+	bool init();
 
-    bool addScanData(const QJsonObject &data);
+	bool addScanData(const QJsonObject &data);
 
-    QJsonArray getLastXScan(int lastX = 1);
+	QJsonArray getLastXScan(int lastX = 1);
 
 private:
-    QString dataBaseFilePath;
-    QSqlDatabase database;
+	QString dataBaseFilePath;
+	QSqlDatabase database;
 };
 
 
