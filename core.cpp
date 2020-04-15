@@ -208,7 +208,7 @@ bool Core::parseSerial(const QString &filePath, bool *isRegistered, bool *checke
 	authClient->start();
 
 	connect(authClient, &AuthClient::finished, authClient, &AuthClient::deleteLater, Qt::UniqueConnection);
-	connect(authClient, &AuthClient::recievedResponse, this, &Core::handleAuthenticationResponse_slot, Qt::UniqueConnection);
+	connect(authClient, &AuthClient::recievedResponse, this, &Core::handleAuthenticationResponse_slot,Qt::UniqueConnection);
 	connect(this, &Core::sendSerialKey_signal, authClient, &AuthClient::sendSerialKey_slot, Qt::UniqueConnection);
 
 	if (!QFile(filePath).exists()) {

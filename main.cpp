@@ -6,19 +6,19 @@
 #include "core.h"
 
 int main(int argc, char *argv[]) {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("MiniFender");
-    QCoreApplication::setApplicationVersion("0.85");
+	QCoreApplication app(argc, argv);
+	QCoreApplication::setApplicationName("MiniFender");
+	QCoreApplication::setApplicationVersion("0.85");
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Handles multiple scan engines");
-    parser.addHelpOption();
-    parser.addVersionOption();
+	QCommandLineParser parser;
+	parser.setApplicationDescription("Handles multiple scan engines");
+	parser.addHelpOption();
+	parser.addVersionOption();
 
-    QString rootDirectory = QCoreApplication::applicationDirPath();
+	QString rootDirectory = QCoreApplication::applicationDirPath();
 
-    auto core = std::make_unique<Core>(rootDirectory);
-    core->start();
+	auto core = std::make_unique<Core>(rootDirectory);
+	core->start();
 
 	auto *isRegistered = new bool();
 	*isRegistered = false;
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 		if (*isChecked) {
 			break;
 		} else {
-			std::this_thread::sleep_for(std::chrono_literals::operator""ms(250));
+			std::this_thread::sleep_for(std::chrono_literals::operator ""ms(250));
 		}
 	}
 
@@ -51,13 +51,13 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-    if (!core->init(rootDirectory + "/settings/settings.ini")) {
+	if (!core->init(rootDirectory + "/settings/settings.ini")) {
 		qCritical() << "[MAIN]\t" << "Cannot parse settings. Shutting down";
-    	core->quit();
-    	core->wait();
-    	QCoreApplication::exit(1);
+		core->quit();
+		core->wait();
+		QCoreApplication::exit(1);
 		return 1;
-    }
+	}
 
-    return QCoreApplication::exec();
+	return QCoreApplication::exec();
 }
