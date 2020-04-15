@@ -25,12 +25,22 @@ add_executable(MiniFender main.cpp core.cpp enginehandler.cpp engine.cpp workert
 install(TARGETS MiniFender
 		CONFIGURATIONS Release
 		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender)
+install(FILES settings.ini auth.ini
+		CONFIGURATIONS Release
+		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender/settings)
+
 install(TARGETS MiniFender_auth_server
 		CONFIGURATIONS Release
 		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender)
+install(FILES AuthServer/auth_settings.ini
+		CONFIGURATIONS Release
+		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender/settings)
+
 install(TARGETS TestEngines
 		CONFIGURATIONS Release
 		DESTINATION ${CMAKE_BINARY_DIR}/MiniFender/engines)
+
+
 
 # linking
 target_link_libraries(MiniFender Qt5::Core Qt5::Sql Qt5::Network)
