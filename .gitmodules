@@ -1,0 +1,6 @@
+[submodule "TestEngines"]
+	path = TestEngines
+	url = git@github.com:TeMeRolEee/TestEngines.git
+[submodule "AuthServer"]
+	path = AuthServer
+	url = git@github.com:TeMeRolEee/MiniFender_auth_server.git

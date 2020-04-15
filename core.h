@@ -1,11 +1,13 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QCoreApplication>
 #include <QUuid>
 
 #include "enginehandler.h"
 #include "dbmanager.h"
 #include "clihandler.h"
+#include "authclient.h"
 
 class Core : public QThread {
 Q_OBJECT
@@ -14,31 +16,46 @@ public:
 
     ~Core();
 
-    bool init(const QString &settingsFilePath, const QString &dbFilePath);
+    bool init(const QString &settingsFilePath);
 
     void listEngineCount();
 
-protected:
-    void run() override;
+	bool parseSerial(const QString &filePath, bool *isRegistered, bool *checked);
 
+protected:
+
+	void run() override;
 private:
+
+	QString rootDirectory;
+
     bool readSettings(const QString &filePath);
 
-    EngineHandler *engineHandler;
+    bool *isRegistered;
 
-    DBManager *dbManager;
+    bool *isChecked;
 
-    CliHandler *cliHandler;
+    int counter = 0;
 
-    QMap<QUuid, QJsonObject> *scanMap;
+    EngineHandler *engineHandler = nullptr;
+
+    DBManager *dbManager = nullptr;
+
+    CliHandler *cliHandler = nullptr;
+
+    QMap<QUuid, QJsonObject> *scanMap = nullptr;
 
     QJsonObject calculateResult(QUuid id);
+
+    AuthClient *authClient = nullptr;
 
 private slots:
 
     void handleEngineResults_slot(QUuid uniqueId, const QJsonObject& result);
 
     void handleNewTask_slot(const QString& input);
+
+	void handleAuthenticationResponse_slot(bool isGood);
 
     void result_slot(QUuid id);
 
@@ -52,6 +69,8 @@ signals:
 
     void startCalculateResult_signal(QUuid id);
 
-    void startWebServer_signal();
+    void checkedRegistration_signal();
+
+	void sendSerialKey_signal(const QString &serial);
 };
 
