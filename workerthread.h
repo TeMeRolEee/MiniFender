@@ -11,7 +11,7 @@ typedef void (*scanFile);
 class WorkerThread : public QThread {
 Q_OBJECT
 public:
-	WorkerThread(QUuid id, const QString &enginePath, const QStringList &paramList);
+	WorkerThread(const QString &enginePath);
 
 	~WorkerThread();
 

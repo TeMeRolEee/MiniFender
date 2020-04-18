@@ -28,7 +28,7 @@ void Engine::handleProcessDone_slot(QUuid uniqueId, QJsonObject result) {
 
 void Engine::addNewWorker_slot(QUuid uniqueId, const QString &parameter) {
 	if (!parameter.isEmpty()) {
-		auto *workerThread = new WorkerThread(uniqueId, enginePath, QStringList() << scanParameter << parameter);
+		auto *workerThread = new WorkerThread(enginePath);
 		engineProcesses->insert(uniqueId, workerThread);
 		workerThread->start();
 

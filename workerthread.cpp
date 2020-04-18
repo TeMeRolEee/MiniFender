@@ -6,6 +6,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSysInfo>
+#include <dbghelp.h>
 
 #include "workerthread.h"
 
@@ -15,8 +16,7 @@ typedef void (*DeInitEngine)();
 
 typedef bool (*Scan)(const QString &filepath, QJsonObject *result);
 
-WorkerThread::WorkerThread(QUuid id, const QString &enginePath, const QStringList &paramList) :
-		id(id),
+WorkerThread::WorkerThread(const QString &enginePath) :
 		enginePath(QDir::toNativeSeparators(enginePath)) {
 	engine = new QLibrary(this);
 	connect(this, &WorkerThread::startWorker_signal, this, &WorkerThread::startWorker_slot, Qt::QueuedConnection);
@@ -34,10 +34,10 @@ void WorkerThread::run() {
 
 void WorkerThread::process_slot(QUuid id, const QString &filePath) {
 	auto scan = (Scan) engine->resolve("scanFile");
-	auto *result = new QJsonObject();
+	QJsonObject result;
 
-	if (scan(filePath, result)) {
-
+	if (scan(filePath, &result)) {
+		emit processDone_signal(id, result);
 	}
 
 	emit processDone_signal(id, QJsonObject());
