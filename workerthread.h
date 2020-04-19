@@ -26,7 +26,7 @@ public slots:
 
 	void process_slot(QUuid id, const QString &filePath);
 
-	void startWorker_slot(QUuid id, const QString &filePath);
+	void startWorker_slot();
 
 	void errorHandling(QProcess::ProcessError error);
 
@@ -38,6 +38,7 @@ signals:
 
 	void startProcess_signal(QUuid id, const QString &filePath);
 
+	void engineInitFinished_signal(bool success);
 };
 
 

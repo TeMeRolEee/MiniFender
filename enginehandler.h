@@ -33,9 +33,11 @@ public slots:
 
 	void handleEngineResult_slot(QUuid uniqueId, QJsonObject result);
 
-	void addNewEngine_slot(const QString &enginePath, const QString &scanParameter, const QString &engineName);
+	void addNewEngine_slot(const QString &enginePath, const QString &engineName);
 
 	void handleNewTask_slot(QUuid uniqueId, const QString &file);
+
+	void handleEngineInit_slot(bool success, const QString &engineName);
 
 signals:
 
@@ -43,6 +45,9 @@ signals:
 
 	void newTask_signal(QUuid uniqueId, const QString &file);
 
+	void startEngine_signal();
+
+	void engineInited_signal();
 };
 
 
