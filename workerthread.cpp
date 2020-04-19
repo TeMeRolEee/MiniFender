@@ -6,6 +6,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSysInfo>
+#include <QtCore/QRunnable>
 
 #include "workerthread.h"
 
@@ -42,8 +43,9 @@ void WorkerThread::process_slot(QUuid id, const QString &filePath) {
 	QJsonObject result;
 
 	if (scan(filePath, &result)) {
-		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << "SCAN SUCCESSFUL";
+		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << "SCAN SUCCESSFUL" << QJsonDocument(result).toJson(QJsonDocument::Compact);
 		emit processDone_signal(id, result);
+		return;
 	}
 
 	emit processDone_signal(id, QJsonObject());

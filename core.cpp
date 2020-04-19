@@ -148,6 +148,7 @@ void Core::handleNewTask_slot(const QString &input) {
 }
 
 void Core::result_slot(QUuid id) {
+	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	QJsonObject finalResult = calculateResult(id);
 
 	std::cout << QJsonDocument(finalResult).toJson(QJsonDocument::JsonFormat::Compact).toStdString() << std::endl;
