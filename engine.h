@@ -12,7 +12,7 @@ class Engine : public QThread {
 Q_OBJECT
 
 public:
-	Engine(int id, const QString &enginePath, const QString &scanParameter);
+	Engine(int id, const QString &enginePath, const QString &engineName);
 
 	~Engine() override;
 
@@ -25,18 +25,22 @@ private:
 	int id = 0;
 
 	QString enginePath;
-	QString scanParameter;
+	QString engineName;
 
 private:
-	QMap<QUuid, WorkerThread *> *engineProcesses;
+	WorkerThread *engine = nullptr;
 
 public slots:
 
 	void handleProcessDone_slot(QUuid uniqueId, QJsonObject result);
 
-	void addNewWorker_slot(QUuid uniqueId, const QString &parameter);
+	void addNewWorker_slot();
 
 	void deleteEngine_slot();
+
+	void startScan_slot(QUuid uniqueId, const QString &filePath);
+
+	void handleWorkerInit_slot(bool success);
 
 signals:
 
@@ -44,8 +48,12 @@ signals:
 
 	void startEngine_signal();
 
+	void startScan_signal(QUuid uniqueId, const QString &filePath);
+
 	void deleteEngine_signal();
 
 	void deletingDone_signal(int id);
+
+	void engineInitFinished_signal(bool success, const QString &engineName);
 };
 

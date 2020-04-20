@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 project(MiniFender)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS ON)
+set(CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC)
 set(CMAKE_AUTORCC)
@@ -20,7 +22,7 @@ include_directories(TestEngines)
 add_subdirectory(AuthServer)
 include_directories(AuthServer)
 
-add_executable(MiniFender main.cpp core.cpp enginehandler.cpp engine.cpp workerthread.cpp dbmanager.cpp clihandler.cpp authclient.cpp authclient.h)
+add_executable(MiniFender main.cpp core.cpp enginehandler.cpp engine.cpp workerthread.cpp dbmanager.cpp clihandler.cpp authclient.cpp)
 
 install(TARGETS MiniFender
 		CONFIGURATIONS Release

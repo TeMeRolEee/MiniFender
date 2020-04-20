@@ -3,11 +3,15 @@
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
+#include <QtCore/QString>
+#include <QtCore/QLibrary>
+
+typedef void (*scanFile);
 
 class WorkerThread : public QThread {
 Q_OBJECT
 public:
-	WorkerThread(QUuid id, const QString &enginePath, const QStringList &paramList);
+	WorkerThread(const QString &enginePath);
 
 	~WorkerThread();
 
@@ -15,16 +19,16 @@ protected:
 	void run() override;
 
 private:
-	QProcess *process;
+	QLibrary *engine;
 	QString enginePath;
-	QStringList paramList;
-	QUuid id;
 
 public slots:
 
-	void processDone_slot();
+	void process_slot(QUuid id, const QString &filePath);
 
 	void startWorker_slot();
+
+	void errorHandling(QProcess::ProcessError error);
 
 signals:
 
@@ -32,6 +36,9 @@ signals:
 
 	void startWorker_signal();
 
+	void startProcess_signal(QUuid id, const QString &filePath);
+
+	void engineInitFinished_signal(bool success);
 };
 
 

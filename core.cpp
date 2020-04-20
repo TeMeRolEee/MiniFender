@@ -54,11 +54,15 @@ bool Core::init(const QString &settingsFilePath) {
 
 	scanMap = new QMap<QUuid, QJsonObject>();
 
-	connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot);
+	engineHandler->start();
+
+	connect(this, &Core::addNewEngine_signal, engineHandler, &EngineHandler::addNewEngine_slot, Qt::QueuedConnection);
 	connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot,Qt::QueuedConnection);
 	connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleEngineResults_slot,Qt::QueuedConnection);
 	connect(engineHandler, &EngineHandler::finished, engineHandler, &EngineHandler::deleteLater);
-	engineHandler->start();
+	connect(engineHandler, &EngineHandler::engineInited_signal, this, &Core::handleEngineInit_slot);
+
+	cliHandler->start();
 
 	connect(cliHandler, &CliHandler::newTask_signal, this, &Core::handleNewTask_slot, Qt::QueuedConnection);
 	connect(cliHandler, &CliHandler::finished, cliHandler, &CliHandler::deleteLater);
@@ -68,10 +72,6 @@ bool Core::init(const QString &settingsFilePath) {
 		qCritical() << "[CORE]\t" << "Could not load any engine. Shutting down!";
 		return false;
 	}
-
-	cliHandler->start();
-
-	listEngineCount();
 
 	return true;
 }
@@ -98,18 +98,19 @@ bool Core::readSettings(const QString &filePath) {
 	QSettings settings(filePath, QSettings::IniFormat);
 	QStringList keys = settings.childGroups();
 
-	for (const auto &groupName : keys) {
-		settings.beginGroup(groupName);
+	for (const auto &engineName : keys) {
+		settings.beginGroup(engineName);
 		QMap<QString, QString> engineData;
 
-		if (settings.childKeys().contains("path") && settings.childKeys().contains("scan_parameter")) {
+		if (settings.childKeys().contains("path")) {
 			for (const auto &key : settings.childKeys()) {
 				engineData.insert(key, settings.value(key).toString());
 			}
-			emit addNewEngine_signal(engineData.value("path"), engineData.value("scan_parameter"), groupName);
+			//qInfo() << "adding engine:" << engineName << engineData.value("path");
+			emit addNewEngine_signal(engineData.value("path"), engineName);
 		} else {
-			badEngines.append(groupName);
-			qWarning() << "[CORE]\t" << "Engine:" << groupName << "cannot be started.\t Skipping";
+			badEngines.append(engineName);
+			qWarning() << "[CORE]\t" << "Engine:" << engineName << "cannot be started.\t Skipping";
 		}
 		settings.endGroup();
 	}
@@ -126,30 +127,28 @@ bool Core::readSettings(const QString &filePath) {
 }
 
 void Core::listEngineCount() {
-	qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
+	qInfo() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
 }
 
 void Core::handleNewTask_slot(const QString &input) {
-	if (!isRegistered) {
-		if (QFile::exists(input)) {
-			QUuid uniqueId = QUuid::createUuid();
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << input;
+	if (QFile::exists(input)) {
+		QUuid uniqueId = QUuid::createUuid();
 
-			QJsonObject initialData;
-			auto *initialArray = new QJsonArray();
-			initialData.insert("scanDate", QDateTime::currentMSecsSinceEpoch());
-			initialData.insert("engineResults", *initialArray);
-			scanMap->insert(uniqueId, initialData);
+		QJsonObject initialData;
+		auto *initialArray = new QJsonArray();
+		initialData.insert("scanDate", QDateTime::currentMSecsSinceEpoch());
+		initialData.insert("engineResults", *initialArray);
+		scanMap->insert(uniqueId, initialData);
 
-			emit startNewScanTask_signal(uniqueId, input);
-		} else {
-			qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
-		}
+		emit startNewScanTask_signal(uniqueId, input);
 	} else {
-		qCritical() << "[CORE]\t" << "ERROR:\t" << "Product not registered, unable to perform scan";
+		qCritical() << "[CORE]\t" << "ERROR:\t" << input << "\t not found. Scan cannot be performed.";
 	}
 }
 
 void Core::result_slot(QUuid id) {
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	QJsonObject finalResult = calculateResult(id);
 
 	std::cout << QJsonDocument(finalResult).toJson(QJsonDocument::JsonFormat::Compact).toStdString() << std::endl;
@@ -161,14 +160,15 @@ void Core::result_slot(QUuid id) {
 }
 
 QJsonObject Core::calculateResult(QUuid id) {
+	//qInfo() << "[CORE]\t" << "Calculating results";
 	int infectedCount = 0;
-	QJsonObject finalResult_prot = scanMap->value(id);
+	auto scanResultObject = scanMap->value(id);
 	QJsonObject finalResult;
+	finalResult.insert("fileName", scanResultObject.value("engineResults").toArray().at(0).toObject().value("scan_result").toArray().at(0).toObject().value("filename")); ///TODO remove unnecessary json array from engine result
 
-	for (int i = 0; i < finalResult.value("engineResults").toArray().count(); i++) {
-		QJsonObject temp = finalResult.value("engineResults").toArray().at(i).toObject();
-		QJsonArray scan_result = temp.value("scan_result").toArray();
-		if (scan_result.at(0).toObject().value("verdict").toInt() == 1) {
+	for (auto results : scanResultObject.value("engineResults").toArray()) {
+		auto scanResult = results.toObject().value("scan_result").toArray();
+		if (scanResult.at(0).toObject().value("verdict").toInt() == 1) {
 			infectedCount++;
 		}
 	}
@@ -181,7 +181,7 @@ QJsonObject Core::calculateResult(QUuid id) {
 
 	int64_t scanDateTime = scanMap->value(id).value("scanDate").toDouble();
 	int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
-	int scanTime = (currentTime - scanDateTime);
+	int scanTime = currentTime - scanDateTime;
 
 	finalResult.insert("scanTime", scanTime);
 
@@ -226,7 +226,7 @@ bool Core::parseSerial(const QString &filePath, bool *isRegistered, bool *checke
 	QString serial = settings->value("serial").toString();
 	QString url = settings->value("url").toString();
 	int port = settings->value("port").toInt();
-	qDebug() << serial << url << port;
+	qInfo() << "[" << "INFO:" << "]" << serial << url << port;
 
 	if (serial.isEmpty() || url.isEmpty() || (port < 1 || port > 65535)) {
 		//qDebug() << "[CORE]\t" << "Wrong auth settings";
@@ -240,5 +240,9 @@ bool Core::parseSerial(const QString &filePath, bool *isRegistered, bool *checke
 	emit sendSerialKey_signal(serial);
 
 	return true;
+}
+
+void Core::handleEngineInit_slot() {
+	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << "[CORE]\t" << "Engine inited" << "engine count is:" << engineHandler->getEngineCount();
 }
 

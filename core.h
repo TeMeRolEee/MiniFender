@@ -36,8 +36,6 @@ private:
 
 	bool *isChecked;
 
-	int counter = 0;
-
 	EngineHandler *engineHandler = nullptr;
 
 	DBManager *dbManager = nullptr;
@@ -54,6 +52,8 @@ private slots:
 
 	void handleEngineResults_slot(QUuid uniqueId, const QJsonObject &result);
 
+	void handleEngineInit_slot();
+
 	void handleNewTask_slot(const QString &input);
 
 	void handleAuthenticationResponse_slot(bool isGood);
@@ -62,7 +62,7 @@ private slots:
 
 signals:
 
-	void addNewEngine_signal(const QString &enginePath, const QString &scanParameter, const QString &engineName);
+	void addNewEngine_signal(const QString &enginePath, const QString &engineName);
 
 	void startNewScanTask_signal(QUuid uniqueId, QString file);
 

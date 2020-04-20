@@ -2,35 +2,74 @@
 #include <QtCore/QJsonObject>
 #include <QUuid>
 #include <QDebug>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QSysInfo>
+#include <QtCore/QRunnable>
 
 #include "workerthread.h"
 
-WorkerThread::WorkerThread(QUuid id, const QString &enginePath, const QStringList &paramList) :
-		id(id),
-		paramList(paramList),
-		enginePath(enginePath) {
-	process = new QProcess();
-	connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,&WorkerThread::processDone_slot, Qt::QueuedConnection);
+typedef bool (*InitEngine)();
+
+typedef void (*DeInitEngine)();
+
+typedef bool (*Scan)(const QString &filepath, QJsonObject *result);
+
+InitEngine initEngine;
+DeInitEngine deInitEngine;
+Scan scan;
+
+WorkerThread::WorkerThread(const QString &enginePath) :
+		enginePath(QDir::toNativeSeparators(enginePath)) {
+	engine = new QLibrary(this);
 	connect(this, &WorkerThread::startWorker_signal, this, &WorkerThread::startWorker_slot, Qt::QueuedConnection);
+	connect(this, &WorkerThread::startProcess_signal, this, &WorkerThread::process_slot, Qt::QueuedConnection);
 }
 
 WorkerThread::~WorkerThread() {
-	process->close();
-	delete process;
+	engine->unload();
+	delete engine;
 }
 
 void WorkerThread::run() {
 	QThread::run();
 }
 
-void WorkerThread::processDone_slot() {
-	QString tempString = process->readAllStandardOutput();
-	QJsonObject object = QJsonDocument::fromJson(tempString.toUtf8()).object();
-	QJsonDocument qJsonDocument(object);
+void WorkerThread::process_slot(QUuid id, const QString &filePath) {
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 
-	emit processDone_signal(id, object);
+	QJsonObject result;
+
+	if (scan(filePath, &result)) {
+		emit processDone_signal(id, result);
+		return;
+	}
+
+	emit processDone_signal(id, QJsonObject());
 }
 
 void WorkerThread::startWorker_slot() {
-	process->start(enginePath, paramList);
+	QFileInfo engineInfo(enginePath);
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << QLibrary::isLibrary(engineInfo.absoluteFilePath());
+	engine->setFileName(engineInfo.absoluteFilePath());
+
+	if (engine->load()) {
+		initEngine = (InitEngine) engine->resolve("init");
+		deInitEngine = (DeInitEngine) engine->resolve("deInit");
+		scan = (Scan) engine->resolve("scanFile");
+
+		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << enginePath << "loaded successfully";
+
+		emit engineInitFinished_signal(initEngine());
+	} else {
+		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << enginePath << "could not be loaded successfully";
+
+		emit engineInitFinished_signal(false);
+	}
+}
+
+void WorkerThread::errorHandling(QProcess::ProcessError error) {
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	qCritical() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << error;
 }

@@ -8,7 +8,7 @@
 int main(int argc, char *argv[]) {
 	QCoreApplication app(argc, argv);
 	QCoreApplication::setApplicationName("MiniFender");
-	QCoreApplication::setApplicationVersion("0.85");
+	QCoreApplication::setApplicationVersion("0.9");
 
 	QCommandLineParser parser;
 	parser.setApplicationDescription("Handles multiple scan engines");
