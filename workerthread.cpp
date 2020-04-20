@@ -37,13 +37,11 @@ void WorkerThread::run() {
 }
 
 void WorkerThread::process_slot(QUuid id, const QString &filePath) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 
-	//QJsonObject *result = new QJsonObject();
 	QJsonObject result;
 
 	if (scan(filePath, &result)) {
-		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << "SCAN SUCCESSFUL" << QJsonDocument(result).toJson(QJsonDocument::Compact);
 		emit processDone_signal(id, result);
 		return;
 	}
@@ -53,7 +51,7 @@ void WorkerThread::process_slot(QUuid id, const QString &filePath) {
 
 void WorkerThread::startWorker_slot() {
 	QFileInfo engineInfo(enginePath);
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << QLibrary::isLibrary(engineInfo.absoluteFilePath());
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << QLibrary::isLibrary(engineInfo.absoluteFilePath());
 	engine->setFileName(engineInfo.absoluteFilePath());
 
 	if (engine->load()) {
@@ -72,6 +70,6 @@ void WorkerThread::startWorker_slot() {
 }
 
 void WorkerThread::errorHandling(QProcess::ProcessError error) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	qCritical() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << error;
 }

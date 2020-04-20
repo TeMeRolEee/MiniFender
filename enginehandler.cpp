@@ -22,12 +22,12 @@ void EngineHandler::run() {
 }
 
 void EngineHandler::handleEngineResult_slot(QUuid uniqueId, QJsonObject result) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << QJsonDocument(result).toJson(QJsonDocument::JsonFormat::Compact);
 	emit scanComplete_signal(uniqueId, std::move(result));
 }
 
 void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &engineName) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	if (!enginePath.isEmpty() && !findExistingEngine(engineName)) {
 		auto engine = new Engine(++engineCount, enginePath, engineName);
 		engineList->insert(engineCount, engine);
@@ -47,7 +47,7 @@ void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &
 }
 
 void EngineHandler::handleNewTask_slot(QUuid uniqueId, const QString &file) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 
 	if (!file.isEmpty()) {
 		emit newTask_signal(uniqueId, file);
@@ -55,17 +55,17 @@ void EngineHandler::handleNewTask_slot(QUuid uniqueId, const QString &file) {
 }
 
 bool EngineHandler::findExistingEngine(const QString &engineName) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	return engineNameList.find(engineName) != engineNameList.end();
 }
 
 int EngineHandler::getEngineCount() {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	return engineCount;
 }
 
 void EngineHandler::handleEngineInit_slot(bool success, const QString &engineName) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << success;
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << success;
 	if (!success) {
 		engineList->value(engineNameList.value(engineName))->quit();
 		engineList->value(engineNameList.value(engineName))->wait();

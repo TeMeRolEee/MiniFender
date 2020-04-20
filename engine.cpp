@@ -18,12 +18,12 @@ void Engine::run() {
 }
 
 void Engine::handleProcessDone_slot(QUuid uniqueId, QJsonObject result) {
-	qInfo() << __FUNCTION__ << __FILE__;
+	//qInfo() << __FUNCTION__ << __FILE__;
 	emit processDone_signal(uniqueId, std::move(result));
 }
 
 void Engine::addNewWorker_slot() {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	engine->start();
 
 	connect(engine, &WorkerThread::processDone_signal, this, &Engine::handleProcessDone_slot,Qt::QueuedConnection);
@@ -47,12 +47,12 @@ const QString &Engine::getEnginePath() const {
 }
 
 void Engine::startScan_slot(QUuid uniqueId, const QString &filePath) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	emit startScan_signal(uniqueId, filePath);
 }
 
 void Engine::handleWorkerInit_slot(bool success) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << success;
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << success;
 	emit engineInitFinished_signal(success, engineName);
 }
 

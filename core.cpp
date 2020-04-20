@@ -106,7 +106,7 @@ bool Core::readSettings(const QString &filePath) {
 			for (const auto &key : settings.childKeys()) {
 				engineData.insert(key, settings.value(key).toString());
 			}
-			qInfo() << "adding engine:" << engineName << engineData.value("path");
+			//qInfo() << "adding engine:" << engineName << engineData.value("path");
 			emit addNewEngine_signal(engineData.value("path"), engineName);
 		} else {
 			badEngines.append(engineName);
@@ -127,11 +127,11 @@ bool Core::readSettings(const QString &filePath) {
 }
 
 void Core::listEngineCount() {
-	qDebug() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
+	qInfo() << "[CORE]\t" << "Engine count is:\t" << engineHandler->getEngineCount();
 }
 
 void Core::handleNewTask_slot(const QString &input) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << input;
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << input;
 	if (QFile::exists(input)) {
 		QUuid uniqueId = QUuid::createUuid();
 
@@ -148,7 +148,7 @@ void Core::handleNewTask_slot(const QString &input) {
 }
 
 void Core::result_slot(QUuid id) {
-	qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
+	//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]";
 	QJsonObject finalResult = calculateResult(id);
 
 	std::cout << QJsonDocument(finalResult).toJson(QJsonDocument::JsonFormat::Compact).toStdString() << std::endl;
@@ -160,15 +160,15 @@ void Core::result_slot(QUuid id) {
 }
 
 QJsonObject Core::calculateResult(QUuid id) {
-	qInfo() << "[CORE]\t" << "Calculating results";
+	//qInfo() << "[CORE]\t" << "Calculating results";
 	int infectedCount = 0;
-	QJsonObject finalResult_prot = scanMap->value(id);
+	auto scanResultObject = scanMap->value(id);
 	QJsonObject finalResult;
+	finalResult.insert("fileName", scanResultObject.value("engineResults").toArray().at(0).toObject().value("scan_result").toArray().at(0).toObject().value("filename")); ///TODO remove unnecessary json array from engine result
 
-	for (int i = 0; i < finalResult.value("engineResults").toArray().count(); i++) {
-		QJsonObject temp = finalResult.value("engineResults").toArray().at(i).toObject();
-		QJsonArray scan_result = temp.value("scan_result").toArray();
-		if (scan_result.at(0).toObject().value("verdict").toInt() == 1) {
+	for (auto results : scanResultObject.value("engineResults").toArray()) {
+		auto scanResult = results.toObject().value("scan_result").toArray();
+		if (scanResult.at(0).toObject().value("verdict").toInt() == 1) {
 			infectedCount++;
 		}
 	}
@@ -181,7 +181,7 @@ QJsonObject Core::calculateResult(QUuid id) {
 
 	int64_t scanDateTime = scanMap->value(id).value("scanDate").toDouble();
 	int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
-	int scanTime = (currentTime - scanDateTime);
+	int scanTime = currentTime - scanDateTime;
 
 	finalResult.insert("scanTime", scanTime);
 
@@ -226,7 +226,7 @@ bool Core::parseSerial(const QString &filePath, bool *isRegistered, bool *checke
 	QString serial = settings->value("serial").toString();
 	QString url = settings->value("url").toString();
 	int port = settings->value("port").toInt();
-	qDebug() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << serial << url << port;
+	qInfo() << "[" << "INFO:" << "]" << serial << url << port;
 
 	if (serial.isEmpty() || url.isEmpty() || (port < 1 || port > 65535)) {
 		//qDebug() << "[CORE]\t" << "Wrong auth settings";
