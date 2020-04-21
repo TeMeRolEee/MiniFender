@@ -4,7 +4,6 @@
 #include <mutex>
 #include <iostream>
 
-#include <QDebug>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QSettings>
 #include <QtCore/QFile>
@@ -60,7 +59,7 @@ bool Core::init(const QString &settingsFilePath) {
 	connect(this, &Core::startNewScanTask_signal, engineHandler, &EngineHandler::handleNewTask_slot,Qt::QueuedConnection);
 	connect(engineHandler, &EngineHandler::scanComplete_signal, this, &Core::handleEngineResults_slot,Qt::QueuedConnection);
 	connect(engineHandler, &EngineHandler::finished, engineHandler, &EngineHandler::deleteLater);
-	connect(engineHandler, &EngineHandler::engineInited_signal, this, &Core::handleEngineInit_slot);
+	connect(engineHandler, &EngineHandler::engineInited_signal, this, &Core::handleEngineInit_slot, Qt::QueuedConnection);
 
 	cliHandler->start();
 
@@ -79,7 +78,7 @@ bool Core::init(const QString &settingsFilePath) {
 void Core::handleEngineResults_slot(QUuid uniqueId, const QJsonObject &result) {
 	auto it = scanMap->find(uniqueId);
 	if (it != scanMap->end()) {
-		QJsonArray temp = it->find("engineResults").value().toArray();
+		auto temp = it->find("engineResults").value().toArray();
 		temp.push_back(result);
 		it->insert("engineResults", temp);
 	}
@@ -107,7 +106,7 @@ bool Core::readSettings(const QString &filePath) {
 				engineData.insert(key, settings.value(key).toString());
 			}
 			//qInfo() << "adding engine:" << engineName << engineData.value("path");
-			emit addNewEngine_signal(engineData.value("path"), engineName);
+			emit addNewEngine_signal(QDir::fromNativeSeparators(engineData.value("path")), engineName);
 		} else {
 			badEngines.append(engineName);
 			qWarning() << "[CORE]\t" << "Engine:" << engineName << "cannot be started.\t Skipping";
@@ -226,10 +225,9 @@ bool Core::parseSerial(const QString &filePath, bool *isRegistered, bool *checke
 	QString serial = settings->value("serial").toString();
 	QString url = settings->value("url").toString();
 	int port = settings->value("port").toInt();
-	qInfo() << "[" << "INFO:" << "]" << serial << url << port;
+	qInfo() << "[" << "INFO:" << "]" << endl << "Serial:" << serial << endl << "Server:" << url << endl << "Port:" << port;
 
 	if (serial.isEmpty() || url.isEmpty() || (port < 1 || port > 65535)) {
-		//qDebug() << "[CORE]\t" << "Wrong auth settings";
 		return false;
 	}
 

@@ -32,8 +32,9 @@ void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &
 		auto engine = new Engine(++engineCount, enginePath, engineName);
 		engineList->insert(engineCount, engine);
 		engineNameList.insert(engineName, engineCount);
-		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << (engineList->keys()) << (engineList->values());
+		//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << (engineList->keys()) << (engineList->values());
 		engine->start();
+
 		connect(engine, &Engine::processDone_signal, this, &EngineHandler::handleEngineResult_slot,Qt::QueuedConnection);
 		connect(this, &EngineHandler::startEngine_signal, engine, &Engine::addNewWorker_slot, Qt::QueuedConnection);
 		connect(this, &EngineHandler::newTask_signal, engine, &Engine::startScan_slot, Qt::QueuedConnection);
@@ -42,7 +43,7 @@ void EngineHandler::addNewEngine_slot(const QString &enginePath, const QString &
 
 		emit startEngine_signal();
 	} else {
-		qCritical() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << "SUMTINGWONG";
+		qCritical() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << "Engine could not be added for some reason";
 	}
 }
 

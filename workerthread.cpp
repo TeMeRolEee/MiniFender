@@ -59,11 +59,11 @@ void WorkerThread::startWorker_slot() {
 		deInitEngine = (DeInitEngine) engine->resolve("deInit");
 		scan = (Scan) engine->resolve("scanFile");
 
-		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << enginePath << "loaded successfully";
+		//qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << enginePath << "loaded successfully";
 
 		emit engineInitFinished_signal(initEngine());
 	} else {
-		qInfo() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << enginePath << "could not be loaded successfully";
+		qCritical() << "[" << __FUNCTION__  << "|" << __FILE__ << "]" << enginePath << "could not be loaded successfully";
 
 		emit engineInitFinished_signal(false);
 	}
