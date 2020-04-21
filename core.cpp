@@ -225,7 +225,7 @@ bool Core::parseSerial(const QString &filePath, bool *isRegistered, bool *checke
 	QString serial = settings->value("serial").toString();
 	QString url = settings->value("url").toString();
 	int port = settings->value("port").toInt();
-	qInfo() << "[" << "INFO:" << "]" << endl << serial << endl << url << endl << port;
+	qInfo() << "[" << "INFO:" << "]" << endl << "Serial:" << serial << endl << "Server:" << url << endl << "Port:" << port;
 
 	if (serial.isEmpty() || url.isEmpty() || (port < 1 || port > 65535)) {
 		return false;
